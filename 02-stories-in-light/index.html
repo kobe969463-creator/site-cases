@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>faruq® — stories in light + motion</title>
+  <meta name="description" content="slow shutters, moving light. short visual stories made after dark." />
+  <meta name="theme-color" content="#2b3342" />
+  <link rel="preload" href="assets/fonts/archivo-500.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/portrait.webp" as="image" />
+  <style>
+    @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 400; font-display: swap; src: url(assets/fonts/archivo-400.woff2) format('woff2'); }
+    @font-face { font-family: 'Archivo'; font-style: normal; font-weight: 500; font-display: swap; src: url(assets/fonts/archivo-500.woff2) format('woff2'); }
+    :root {
+      --bg: #2b3342;
+      --fg: #f0f0ee;
+      --link: #f3f2f2;
+      --dim: rgba(240, 240, 238, 0.42);
+      --meta: rgba(240, 240, 238, 0.64);
+      --rule: rgba(240, 240, 238, 0.18);
+      --pad-x: 64px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); }
+    html { color-scheme: dark; }
+    body { touch-action: manipulation; }
+    a, button { -webkit-tap-highlight-color: rgba(240, 240, 238, 0.12); }
+    body {
+      font-family: 'Archivo', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Microsoft YaHei', ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: var(--link); text-underline-offset: 3px; }
+    a:hover { color: #ffffff; }
+    a:focus-visible, button:focus-visible { outline: 1.5px solid var(--fg); outline-offset: 4px; }
+    ::selection { background: rgba(240, 240, 238, 0.85); color: var(--bg); }
+
+    /* ───────── hero ───────── */
+    .hero {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .hero__layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transform: translateZ(0);
+    }
+    .hero__layer--clean { user-select: none; -webkit-user-select: none; -webkit-user-drag: none; }
+    .hero__layer--gold-base { opacity: 0.1; pointer-events: none; }
+    .hero__layer--gold-reveal {
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+      will-change: opacity;
+      pointer-events: none;
+      -webkit-mask-image: radial-gradient(closest-side, #000 62%, transparent 100%);
+              mask-image: radial-gradient(closest-side, #000 62%, transparent 100%);
+      -webkit-mask-repeat: no-repeat;
+              mask-repeat: no-repeat;
+      -webkit-mask-size: 110px 140px;
+              mask-size: 110px 140px;
+      -webkit-mask-position: -200px -200px;
+              mask-position: -200px -200px;
+    }
+    .hero__scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(20, 24, 32, 0.55) 0%, rgba(20, 24, 32, 0.12) 45%, rgba(20, 24, 32, 0.6) 100%);
+      pointer-events: none;
+    }
+    .hero__content {
+      position: relative;
+      z-index: 3;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 44px var(--pad-x) 40px;
+      pointer-events: none;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    .topbar__group { display: flex; gap: 28px; }
+    .topbar__group--right { gap: 14px; }
+    .topbar__end { display: flex; align-items: baseline; gap: 40px; }
+    .pill {
+      border: 1.5px solid var(--fg);
+      border-radius: 999px;
+      padding: 4px 20px;
+      font-size: 15px;
+    }
+
+    /* language switch, set in the same metadata type as the top bar */
+    .lang { display: inline-flex; align-items: baseline; gap: 8px; pointer-events: auto; }
+    .lang button {
+      padding: 0;
+      border: 0;
+      background: none;
+      font: inherit;
+      letter-spacing: inherit;
+      color: var(--dim);
+      cursor: pointer;
+      transition: color 0.3s ease-out;
+    }
+    .lang button:hover { color: var(--fg); }
+    .lang button[aria-pressed="true"] { color: var(--fg); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1.5px; }
+
+    .headline {
+      margin: 40px 0 0;
+      font-size: clamp(52px, 7.4vw, 104px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 0.98;
+      text-transform: lowercase;
+    }
+    .headline__line { display: block; }
+    .headline__row { display: inline-flex; align-items: center; gap: 24px; }
+    .plus {
+      width: 0.8em;
+      height: 0.8em;
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--fg);
+      border-radius: 50%;
+      line-height: 1;
+    }
+    .plus span { font-size: 0.45em; font-weight: 400; line-height: 1; transform: translateY(-0.05em); }
+    .hero__bottom {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 48px;
+    }
+    .hero__tag { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.45; }
+    .hero__note { max-width: 560px; }
+    .hero__note p {
+      margin: 0;
+      font-size: 15.5px;
+      line-height: 1.6;
+      word-spacing: 0.15em;
+      text-align: justify;
+    }
+    .hero__meta {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      letter-spacing: 0.02em;
+    }
+    .hero__meta a { pointer-events: auto; text-decoration: none; color: var(--fg); }
+    .hero__meta a:hover { color: #fff; }
+
+    /* ───────── selected work (index) ───────── */
+    .work {
+      position: relative;
+      padding: 120px var(--pad-x) 140px;
+      --lx: 50%;
+      --ly: -400px;
+      background:
+        radial-gradient(360px 260px at var(--lx) var(--ly), rgba(240, 240, 238, 0.07), transparent 70%),
+        var(--bg);
+    }
+    .work__head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      padding-bottom: 28px;
+    }
+    .work__head h2 { margin: 0; font: inherit; }
+    .index { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--rule); }
+    .index__row {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr) 200px 180px 72px;
+      align-items: baseline;
+      gap: 24px;
+      padding: 30px 0 26px;
+      border-top: 1px solid var(--rule);
+      color: var(--dim);
+      transition: color 0.4s ease-out;
+    }
+    .index__no, .index__cell, .index__year { color: var(--meta); transition: color 0.4s ease-out; }
+    .index__row:hover, .index__row:focus-visible,
+    .index__row:hover :is(.index__no, .index__cell, .index__year),
+    .index__row:focus-visible :is(.index__no, .index__cell, .index__year) { color: var(--fg); }
+    @media (hover: none) {
+      .index__row, .index__row :is(.index__no, .index__cell, .index__year) { color: var(--fg); }
+    }
+    .index__no { font-size: 14px; letter-spacing: 0.02em; }
+    .index__no, .index__year, .index__cell { font-variant-numeric: tabular-nums; }
+    .index__title {
+      font-size: clamp(30px, 4.2vw, 60px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .index__row:hover .index__title, .index__row:focus-visible .index__title { transform: translateX(14px); }
+    .index__cell { font-size: 15px; letter-spacing: 0.02em; }
+    .index__year { font-size: 15px; letter-spacing: 0.02em; text-align: right; }
+
+    /* ───────── contact / close ───────── */
+    .close {
+      padding: 40px var(--pad-x) 40px;
+      border-top: 1px solid var(--rule);
+    }
+    .close__line {
+      margin: 72px 0 96px;
+      font-size: clamp(40px, 6.4vw, 92px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 0.98;
+      max-width: 14ch;
+    }
+    .close__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 48px;
+      max-width: 1040px;
+      font-size: 15.5px;
+      line-height: 1.6;
+      word-spacing: 0.15em;
+    }
+    .close__grid h3 { margin: 0 0 10px; font-size: 14px; font-weight: 500; letter-spacing: 0.02em; color: var(--meta); }
+    .close__grid p, .close__grid ul { margin: 0; padding: 0; list-style: none; }
+    .footer {
+      margin-top: 120px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    /* ───────── 中文排版：汉字不收紧字距、行高放宽、不用西文词距 ───────── */
+    html[lang="zh-CN"] .headline { letter-spacing: 0.01em; line-height: 1.12; }
+    html[lang="zh-CN"] .headline__row { gap: 20px; }
+    html[lang="zh-CN"] .hero__note p { word-spacing: normal; line-height: 1.85; letter-spacing: 0.02em; }
+    html[lang="zh-CN"] .index__title { letter-spacing: 0.01em; line-height: 1.15; }
+    html[lang="zh-CN"] .close__line { letter-spacing: 0.01em; line-height: 1.2; max-width: 11em; }
+    html[lang="zh-CN"] :is(.headline, .index__title, .close__line) { word-break: keep-all; overflow-wrap: anywhere; }
+    html[lang="zh-CN"] .close__grid { word-spacing: normal; line-height: 1.85; }
+
+    /* ───────── narrow screens ───────── */
+    @media (max-width: 900px) {
+      :root { --pad-x: 28px; }
+      .index__row { grid-template-columns: 40px minmax(0, 1fr) 72px; row-gap: 10px; }
+      .index__cell { grid-column: 2 / 3; }
+      .index__cell + .index__cell { margin-top: -6px; }
+      .index__year { grid-row: 1; grid-column: 3; }
+    }
+    @media (max-width: 640px) {
+      :root { --pad-x: 20px; }
+      .hero { height: 100svh; }
+      .hero__content { padding: 24px var(--pad-x) 24px; }
+      .topbar { font-size: 14px; }
+      .topbar__group--right { display: none; }
+      .topbar__group { gap: 18px; }
+      .pill { font-size: 13px; padding: 3px 14px; }
+      .headline { margin-top: 32px; font-size: 10.6vw; }
+      .headline__row { gap: 14px; }
+      .hero__bottom { flex-direction: column-reverse; align-items: stretch; gap: 20px; }
+      .hero__note p { text-align: left; font-size: 14.5px; }
+      .hero__tag { font-size: 16px; }
+      .work { padding: 80px var(--pad-x) 96px; }
+      .close__grid { grid-template-columns: 1fr; gap: 32px; }
+      .footer { flex-wrap: wrap; gap: 12px; }
+      html[lang="zh-CN"] .close__line { font-size: 8.4vw; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero__layer--gold-reveal, .index__row, .index__title { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <!--
+    stories in light — photographer portfolio (case study)
+    Hero design & portraits: SceneAI (sceneai.art); the gold layer is re-aligned to the portrait so the reveal lines up at any aspect ratio.
+  -->
+  <main>
+    <section class="hero" id="top" data-i18n-aria="heroAria" aria-label="stories in light + motion">
+      <img class="hero__layer hero__layer--clean"
+        src="assets/portrait.webp"
+        data-i18n-alt="portraitAlt" alt="a dark studio portrait of a young man against an ornamental backdrop"
+        width="2800" height="1899" draggable="false" fetchpriority="high" decoding="async" />
+      <img class="hero__layer hero__layer--gold-base"
+        src="assets/portrait-gold.webp"
+        alt="" aria-hidden="true" width="2800" height="1899" draggable="false" decoding="async" />
+      <img class="hero__layer hero__layer--gold-reveal" id="reveal"
+        src="assets/portrait-gold.webp"
+        alt="" aria-hidden="true" width="2800" height="1899" draggable="false" decoding="async" />
+      <div class="hero__scrim" aria-hidden="true"></div>
+
+      <div class="hero__content">
+        <header class="topbar">
+          <div class="topbar__group"><span translate="no">faruq®</span><span data-i18n="archive">visual archive</span></div>
+          <span class="pill">©2026</span>
+          <div class="topbar__end">
+            <div class="topbar__group topbar__group--right">
+              <span aria-hidden="true">(</span><span data-i18n="exposure">long exposure</span><span aria-hidden="true">/</span><span data-i18n="lowLight">low light</span><span aria-hidden="true">)</span>
+            </div>
+            <div class="lang" role="group" data-i18n-aria="langLabel" aria-label="language">
+              <button type="button" data-lang="en" lang="en" aria-pressed="true">en</button>
+              <span aria-hidden="true">/</span>
+              <button type="button" data-lang="zh" lang="zh-CN" aria-pressed="false">中</button>
+            </div>
+          </div>
+        </header>
+
+        <h1 class="headline">
+          <span class="headline__line" data-i18n="h1a">stories in light</span>
+          <span class="headline__row"><span class="plus" aria-hidden="true"><span>+</span></span><span data-i18n="h1b">motion</span></span>
+        </h1>
+
+        <div class="hero__bottom">
+          <p class="hero__tag" data-i18n="tag">night work only</p>
+          <div class="hero__note">
+            <p data-i18n="note">slow shutters, moving light. i make short visual stories after dark — where motion becomes the subject and light does the drawing. no studio, no staging: just time, left open long enough to leave a trace.</p>
+            <div class="hero__meta">
+              <span data-i18n="vol">selected work — vol.01</span>
+              <a href="#work" data-i18n="scroll">( scroll ↓ )</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="work" id="work" aria-labelledby="work-title">
+      <div class="work__head">
+        <h2 id="work-title" data-i18n="vol">selected work — vol.01</h2>
+        <span data-i18n="count">( 07 stories )</span>
+      </div>
+      <ol class="index" id="index"></ol>
+    </section>
+
+    <section class="close" id="contact" aria-labelledby="close-title">
+      <h2 class="close__line" id="close-title" data-i18n="closeLine">i work between sunset and the first bus.</h2>
+      <div class="close__grid">
+        <div>
+          <h3 data-i18n="commissions">commissions</h3>
+          <ul>
+            <li data-i18n="comm1">editorial &amp; night features</li>
+            <li data-i18n="comm2">music sleeves and tour stills</li>
+            <li data-i18n="comm3">campaigns that happen after dark</li>
+          </ul>
+        </div>
+        <div>
+          <h3 data-i18n="method">method</h3>
+          <p data-i18n="methodText">tripod, open shutter, available light. every frame is a single exposure; nothing is composited after the fact.</p>
+        </div>
+      </div>
+      <footer class="footer">
+        <span><span translate="no">faruq®</span> <span data-i18n="archive">visual archive</span></span>
+        <span class="pill">©2026</span>
+        <span data-i18n="tag">night work only</span>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      /* ───────── copy ───────── */
+      var WORKS = [
+        { no: '01', exp: '30s · f/11 · iso\u00A0100', year: '2026', en: ['tail lights, route 9', 'lisbon, pt'], zh: ['9 号公路的尾灯', '里斯本，葡萄牙'] },
+        { no: '02', exp: '8s · f/8 · iso\u00A0200', year: '2025', en: ['the last tram', 'porto, pt'], zh: ['末班电车', '波尔图，葡萄牙'] },
+        { no: '03', exp: '25s · f/16 · iso\u00A0100', year: '2025', en: ['harbour, 3 a.m.', 'istanbul, tr'], zh: ['凌晨三点的港口', '伊斯坦布尔，土耳其'] },
+        { no: '04', exp: '2s · f/2.8 · iso\u00A0400', year: '2025', en: ['moth & sodium lamp', 'marrakech, ma'], zh: ['飞蛾与钠灯', '马拉喀什，摩洛哥'] },
+        { no: '05', exp: '15s · f/9 · iso\u00A0100', year: '2024', en: ['rain on the overpass', 'tokyo, jp'], zh: ['高架桥上的雨', '东京，日本'] },
+        { no: '06', exp: '45s · f/13 · iso\u00A050', year: '2024', en: ['bridge, breathing', 'budapest, hu'], zh: ['会呼吸的桥', '布达佩斯，匈牙利'] },
+        { no: '07', exp: '4s · f/5.6 · iso\u00A0100', year: '2023', en: ['fireworks, no sky', 'valletta, mt'], zh: ['没有天空的烟火', '瓦莱塔，马耳他'] },
+      ];
+      var I18N = {
+        en: {
+          htmlLang: 'en',
+          title: 'faruq® — stories in light + motion',
+          description: 'slow shutters, moving light. short visual stories made after dark.',
+          heroAria: 'stories in light + motion',
+          portraitAlt: 'a dark studio portrait of a young man against an ornamental backdrop',
+          langLabel: 'language',
+          archive: 'visual archive', exposure: 'long exposure', lowLight: 'low light',
+          h1a: 'stories in light', h1b: 'motion',
+          tag: 'night work only',
+          note: 'slow shutters, moving light. i make short visual stories after dark — where motion becomes the subject and light does the drawing. no studio, no staging: just time, left open long enough to leave a trace.',
+          vol: 'selected work — vol.01', scroll: '( scroll ↓ )', count: '( 07 stories )',
+          closeLine: 'i work between sunset and the first bus.',
+          commissions: 'commissions',
+          comm1: 'editorial & night features', comm2: 'music sleeves and tour stills', comm3: 'campaigns that happen after dark',
+          method: 'method',
+          methodText: 'tripod, open shutter, available light. every frame is a single exposure; nothing is composited after the fact.',
+        },
+        zh: {
+          htmlLang: 'zh-CN',
+          title: 'faruq® — 光里的故事 + 流动',
+          description: '慢快门，流动的光。天黑之后拍下的短篇影像。',
+          heroAria: '光里的故事 + 流动',
+          portraitAlt: '一位年轻男子的暗调棚拍人像，背景是繁复的暗纹墙纸',
+          langLabel: '语言',
+          archive: '影像档案', exposure: '长曝光', lowLight: '弱光',
+          h1a: '光里的故事', h1b: '流动',
+          tag: '只在夜里工作',
+          note: '慢快门，流动的光。我在天黑之后拍短篇影像——让运动成为主角，让光自己作画。没有影棚，也不摆拍：只有时间，快门开得足够久，久到留下痕迹。',
+          vol: '作品选 — 第 01 辑', scroll: '( 向下 ↓ )', count: '( 共 07 则 )',
+          closeLine: '我的工作时间，|在日落|与首班车之间。',
+          commissions: '接受委托',
+          comm1: '杂志与夜间专题', comm2: '唱片封面与巡演剧照', comm3: '天黑之后才开始的广告',
+          method: '方法',
+          methodText: '三脚架，打开的快门，现场的光。每一帧都是一次曝光完成，事后不做任何合成。',
+        },
+      };
+
+      var LANG_KEY = 'faruq-lang';
+      function initialLang() {
+        try {
+          var q = new URLSearchParams(location.search).get('lang');
+          if (q === 'zh' || q === 'en') return q;
+        } catch (e) {}
+        try {
+          var saved = localStorage.getItem(LANG_KEY);
+          if (saved === 'zh' || saved === 'en') return saved;
+        } catch (e) {}
+        var prefs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en']);
+        for (var i = 0; i < prefs.length; i++) {
+          var l = String(prefs[i]).toLowerCase();
+          if (l.indexOf('zh') === 0) return 'zh';
+          if (l.indexOf('en') === 0) return 'en';
+        }
+        return 'en';
+      }
+
+      /* '|' in copy marks a preferred line-break point (Chinese has no spaces to break on) */
+      function setText(el, s) {
+        if (s.indexOf('|') < 0) { el.textContent = s; return; }
+        el.textContent = '';
+        s.split('|').forEach(function (part, i) {
+          if (i) el.appendChild(document.createElement('wbr'));
+          el.appendChild(document.createTextNode(part));
+        });
+      }
+
+      var indexEl = document.getElementById('index');
+      function renderIndex(lang) {
+        indexEl.innerHTML = '';
+        WORKS.forEach(function (w) {
+          var li = document.createElement('li');
+          li.className = 'index__row';
+          var cells = [
+            ['index__no', w.no], ['index__title', w[lang][0]], ['index__cell', w[lang][1]],
+            ['index__cell', w.exp], ['index__year', w.year],
+          ];
+          cells.forEach(function (c) {
+            var s = document.createElement('span');
+            s.className = c[0];
+            s.textContent = c[1];
+            if (c[1] === w.exp) s.lang = 'en';
+            li.appendChild(s);
+          });
+          indexEl.appendChild(li);
+        });
+      }
+
+      function applyLang(lang, persist) {
+        var t = I18N[lang];
+        document.documentElement.lang = t.htmlLang;
+        document.title = t.title;
+        var meta = document.querySelector('meta[name="description"]');
+        if (meta) meta.setAttribute('content', t.description);
+        document.querySelectorAll('[data-i18n]').forEach(function (el) { setText(el, t[el.getAttribute('data-i18n')]); });
+        document.querySelectorAll('[data-i18n-aria]').forEach(function (el) { el.setAttribute('aria-label', t[el.getAttribute('data-i18n-aria')]); });
+        document.querySelectorAll('[data-i18n-alt]').forEach(function (el) { el.setAttribute('alt', t[el.getAttribute('data-i18n-alt')]); });
+        document.querySelectorAll('.lang [data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang)); });
+        renderIndex(lang);
+        if (persist) {
+          try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+          try {
+            var url = new URL(location.href);
+            url.searchParams.set('lang', lang);
+            history.replaceState(null, '', url);
+          } catch (e) {}
+        }
+      }
+      document.querySelectorAll('.lang [data-lang]').forEach(function (b) {
+        b.addEventListener('click', function () { applyLang(b.getAttribute('data-lang'), true); });
+      });
+      applyLang(initialLang(), false);
+
+      /* ───────── hero: one soft oval spotlight that glides toward the cursor ───────── */
+      var hero = document.querySelector('.hero');
+      var reveal = document.getElementById('reveal');
+      var fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+      var OVAL_W = 110, OVAL_H = 140, LERP = 0.22, SETTLE = 0.3;
+      var tx = 0, ty = 0, cx = 0, cy = 0, raf = 0, active = false;
+
+      function paint() {
+        var pos = (cx - OVAL_W / 2) + 'px ' + (cy - OVAL_H / 2) + 'px';
+        reveal.style.webkitMaskPosition = pos;
+        reveal.style.maskPosition = pos;
+      }
+      function tick() {
+        cx += (tx - cx) * LERP;
+        cy += (ty - cy) * LERP;
+        if (Math.abs(tx - cx) < SETTLE && Math.abs(ty - cy) < SETTLE) {
+          cx = tx; cy = ty; paint(); raf = 0; return;
+        }
+        paint();
+        raf = requestAnimationFrame(tick);
+      }
+      function onMove(e) {
+        var r = hero.getBoundingClientRect();
+        tx = e.clientX - r.left;
+        ty = e.clientY - r.top;
+        if (!active) {
+          active = true;
+          cx = tx; cy = ty; paint();
+          reveal.style.opacity = '1';
+        }
+        if (!raf) raf = requestAnimationFrame(tick);
+      }
+      function onLeave() {
+        active = false;
+        reveal.style.opacity = '0';
+      }
+      function bind(on) {
+        if (on) {
+          hero.addEventListener('mousemove', onMove);
+          hero.addEventListener('mouseleave', onLeave);
+        } else {
+          hero.removeEventListener('mousemove', onMove);
+          hero.removeEventListener('mouseleave', onLeave);
+          onLeave();
+        }
+      }
+      bind(fine.matches);
+      if (fine.addEventListener) fine.addEventListener('change', function (e) { bind(e.matches); });
+
+      /* ───────── index: the same light, wider and fainter, follows the cursor across the list ───────── */
+      var work = document.querySelector('.work');
+      var wx = 0, wy = -400, gx = 0, gy = -400, wraf = 0;
+      function wtick() {
+        gx += (wx - gx) * LERP;
+        gy += (wy - gy) * LERP;
+        work.style.setProperty('--lx', gx.toFixed(1) + 'px');
+        work.style.setProperty('--ly', gy.toFixed(1) + 'px');
+        if (Math.abs(wx - gx) < SETTLE && Math.abs(wy - gy) < SETTLE) { wraf = 0; return; }
+        wraf = requestAnimationFrame(wtick);
+      }
+      if (fine.matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        work.addEventListener('mousemove', function (e) {
+          var r = work.getBoundingClientRect();
+          if (gy < -300) { gx = e.clientX - r.left; gy = e.clientY - r.top; }
+          wx = e.clientX - r.left;
+          wy = e.clientY - r.top;
+          if (!wraf) wraf = requestAnimationFrame(wtick);
+        });
+        work.addEventListener('mouseleave', function () {
+          wy = -400; gy = -400;
+          work.style.setProperty('--ly', '-400px');
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

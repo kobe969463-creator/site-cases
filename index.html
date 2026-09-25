@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#f4f3ef" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e0e10" media="(prefers-color-scheme: dark)" />
+  <title>网站案例</title>
+  <meta name="description" content="三个不同类型的单页网站案例：AI SaaS 产品页、摄影师作品集、旅行社服务页。" />
+  <style>
+    :root {
+      --bg: #0e0e10;
+      --fg: #f2f1ee;
+      --muted: rgba(242, 241, 238, 0.62);
+      --rule: rgba(242, 241, 238, 0.12);
+    }
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        --bg: #f4f3ef;
+        --fg: #141416;
+        --muted: rgba(20, 20, 22, 0.62);
+        --rule: rgba(20, 20, 22, 0.12);
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); }
+    body {
+      touch-action: manipulation;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+    a { color: inherit; }
+    .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+    header { padding: 88px 0 56px; border-bottom: 1px solid var(--rule); }
+    h1 { margin: 0; font-size: clamp(40px, 6vw, 72px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; }
+    .lede { margin: 20px 0 0; max-width: 40em; font-size: 17px; color: var(--muted); }
+    .case {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 48px;
+      align-items: center;
+      padding: 56px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .shot {
+      display: block;
+      border-radius: 14px;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      background: #1a1a1d;
+      box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
+    }
+    .shot img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .shot:hover img, .shot:focus-visible img { transform: scale(1.025); }
+    .shot:focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; }
+    .type { margin: 0; font-size: 14px; color: var(--muted); }
+    .case h2 { margin: 6px 0 14px; font-size: clamp(28px, 3vw, 38px); font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; }
+    .case p.pitch { margin: 0; font-size: 16px; }
+    dl { margin: 24px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 18px; font-size: 14px; }
+    dt { color: var(--muted); }
+    dd { margin: 0; }
+    .links { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 18px; border-radius: 999px; font-size: 14px; text-decoration: none;
+      border: 1px solid var(--rule); transition: background-color 0.2s, border-color 0.2s;
+    }
+    .btn:hover { border-color: var(--fg); }
+    .btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+    .btn.primary:hover { opacity: 0.88; }
+    .btn:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+    footer { padding: 40px 0 64px; font-size: 13px; color: var(--muted); }
+    @media (max-width: 820px) {
+      header { padding: 56px 0 40px; }
+      .case { grid-template-columns: 1fr; gap: 24px; padding: 40px 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>网站案例</h1>
+      <p class="lede">三个不同类型的单页网站：AI SaaS 产品页、摄影师个人作品集、旅行社服务页。都能直接点开浏览，交互和动效是真实可用的，不是截图；桌面和手机都适配，中英双语一键切换。</p>
+    </header>
+
+    <main>
+      <article class="case">
+        <a class="shot" href="01-clarion-ai-saas/index.html" aria-label="打开 Plety 网站">
+          <img src="covers/01.webp" alt="Plety 首屏：黑底上流动的橙色 3D 丝带，标题 The intelligence layer for clear decisions" width="1440" height="900" fetchpriority="high" />
+        </a>
+        <div>
+          <p class="type">AI SaaS 产品落地页</p>
+          <h2>Plety</h2>
+          <p class="pitch">流光丝带背景视频、滚动渐入、无缝 logo 跑马灯，两块可以点着玩的产品界面：输入框能打字，录音卡片能播放，播放时波形和转写文字逐步点亮。</p>
+          <dl>
+            <dt>结构</dt><dd>导航 · 首屏 · AI 对话 · AI 转写 · FAQ · 行动号召 + 页脚</dd>
+            <dt>技术</dt><dd>React + Tailwind，预编译为静态文件</dd>
+            <dt>语言</dt><dd>中文 / English，一键切换</dd>
+          </dl>
+          <div class="links">
+            <a class="btn primary" href="01-clarion-ai-saas/index.html">打开网站 →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="case">
+        <a class="shot" href="02-stories-in-light/index.html" aria-label="打开 faruq 作品集网站">
+          <img src="covers/02.webp" alt="faruq 作品集首屏：暗调人像，鼠标所到之处露出金色面具" width="1440" height="900" loading="lazy" />
+        </a>
+        <div>
+          <p class="type">摄影师个人作品集</p>
+          <h2>stories in light</h2>
+          <p class="pitch">鼠标就是手电筒：光斑滑过人像，照到的地方露出金色面具和暗纹墙纸。往下的作品索引延续这个隐喻，光跟着鼠标走，经过的那一行被点亮。</p>
+          <dl>
+            <dt>结构</dt><dd>首屏 · 作品索引 · 委托与方法</dd>
+            <dt>技术</dt><dd>原生 HTML / CSS / JS，CSS mask + requestAnimationFrame</dd>
+            <dt>语言</dt><dd>中文 / English，一键切换</dd>
+          </dl>
+          <div class="links">
+            <a class="btn primary" href="02-stories-in-light/index.html">打开网站 →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="case">
+        <a class="shot" href="03-airlines-travel/index.html" aria-label="打开 Airlines 网站">
+          <img src="covers/03.webp" alt="Airlines 首屏：透过飞机舷窗看到的紫粉色晚霞" width="1440" height="900" loading="lazy" />
+        </a>
+        <div>
+          <p class="type">旅行社 · 本地服务业</p>
+          <h2>Airlines</h2>
+          <p class="pitch">首屏是镜头穿过舷窗的视频。往下所有照片都框在舷窗形状里；结尾的晚霞随滚动从一扇舷窗慢慢放大到整屏，和首屏首尾呼应。</p>
+          <dl>
+            <dt>结构</dt><dd>首屏 · 关于 · 目的地轨道 · 服务 · 本月目的地 · 常见问题 · 结尾</dd>
+            <dt>技术</dt><dd>HTML + Tailwind，滚动驱动的 clip-path</dd>
+            <dt>语言</dt><dd>中文 / English，一键切换</dd>
+          </dl>
+          <div class="links">
+            <a class="btn primary" href="03-airlines-travel/index.html">打开网站 →</a>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer>
+      三个案例的首屏视觉与视频、人像素材来自 <a href="https://sceneai.art" rel="noopener" target="_blank">SceneAI</a>，旅行照片来自 <a href="https://unsplash.com" rel="noopener" target="_blank">Unsplash</a>。案例中的品牌、人物与文案均为示例内容。
+    </footer>
+  </div>
+</body>
+</html>

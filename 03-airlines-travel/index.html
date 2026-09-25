@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Airlines — Travel the World Without Any Stress</title>
+  <meta name="description" content="Let us take care of the planning while you enjoy meaningful travel experiences crafted just for you." />
+  <meta name="theme-color" content="#0d0b12" />
+  <link rel="preload" href="assets/fonts/inter-500.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/hero-poster.webp" as="image" />
+  <link rel="stylesheet" href="assets/tw.css" />
+  <style>
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url(assets/fonts/inter-400.woff2) format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url(assets/fonts/inter-500.woff2) format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap; src: url(assets/fonts/inter-600.woff2) format('woff2'); }
+
+    html { scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none; color-scheme: dark; scroll-padding-top: 88px; }
+    html::-webkit-scrollbar, body::-webkit-scrollbar, .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { scrollbar-width: none; }
+    body { background: #0d0b12; touch-action: manipulation; }
+    a, button, summary { -webkit-tap-highlight-color: rgba(255, 255, 255, 0.08); }
+    ::selection { background: rgba(242, 184, 198, 0.35); }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-up { animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+    /* The motif: every photograph is seen through an aircraft window. */
+    .window {
+      position: relative;
+      overflow: hidden;
+      border-radius: 42% / 31%;
+      isolation: isolate;
+      background: #1b1822;
+    }
+    .window::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+        inset 0 22px 44px -12px rgba(0, 0, 0, 0.55),
+        inset 0 -16px 36px -18px rgba(0, 0, 0, 0.5);
+    }
+    .window img { transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+    .group:hover .window img, .group:focus-visible .window img { transform: scale(1.06); }
+
+    .cta-clip { will-change: clip-path; }
+    .track-pad {
+      padding-inline: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem));
+      scroll-padding-inline: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem));
+    }
+    #nav.is-solid { background: rgba(13, 11, 18, 0.8); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+
+    /* Language switch: same outline-pill vocabulary as "Start Travel" */
+    .lang-switch { display: inline-flex; align-items: center; border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 999px; padding: 2px; }
+    .lang-switch button {
+      font-size: 13px; line-height: 1; padding: 6px 10px; border-radius: 999px;
+      color: rgba(255, 255, 255, 0.75); transition: background-color 0.25s, color 0.25s;
+    }
+    .lang-switch button:hover { color: #fff; }
+    .lang-switch button[aria-pressed="true"] { background: #fff; color: #000; }
+    .lang-switch button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+    details summary::-webkit-details-marker { display: none; }
+    details[open] .faq-icon { transform: rotate(45deg); }
+
+    /* 中文：取消负字距，标题行高放宽 */
+    html[lang="zh-CN"] .tracking-tight { letter-spacing: 0; }
+    html[lang="zh-CN"] h1, html[lang="zh-CN"] h2 { line-height: 1.22; }
+    html[lang="zh-CN"] .leading-relaxed { line-height: 1.8; }
+    /* 中文标题只在标点处换行，放不下时才强制断开 */
+    html[lang="zh-CN"] :is(h1, h2, h3) { word-break: keep-all; overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .fade-in-up { animation: none; }
+      .window img, .cta-clip { transition: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-cabin text-white font-sans antialiased">
+  <a href="#main" data-i18n="skip" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-black">Skip to content</a>
+  <!--
+    Airlines — travel agency one-pager (case study)
+    Hero design & video: SceneAI (sceneai.art) · Photos: Unsplash
+    Styles: Tailwind CLI → assets/tw.css
+  -->
+
+  <!-- ───────── Navigation ───────── -->
+  <header id="nav" class="fixed top-0 inset-x-0 z-50 transition-colors duration-300">
+    <nav class="fade-in-up max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-6" style="animation-delay: 0.1s" data-i18n-aria="mainNav" aria-label="Main">
+      <a href="#top" class="text-white font-semibold text-xl tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white rounded" lang="en" translate="no">Airlines</a>
+
+      <ul class="hidden md:flex items-center gap-8">
+        <li><a href="#about" data-i18n="nav.about" class="text-[14px] font-normal text-white/90 hover:text-white transition-colors">About</a></li>
+        <li><a href="#services" data-i18n="nav.services" class="text-[14px] font-normal text-white/90 hover:text-white transition-colors">Services</a></li>
+        <li><a href="#locations" data-i18n="nav.locations" class="text-[14px] font-normal text-white/90 hover:text-white transition-colors">Locations</a></li>
+        <li><a href="#places" data-i18n="nav.places" class="text-[14px] font-normal text-white/90 hover:text-white transition-colors">Places</a></li>
+        <li><a href="#support" data-i18n="nav.support" class="text-[14px] font-normal text-white/90 hover:text-white transition-colors">Support</a></li>
+      </ul>
+
+      <div class="flex items-center gap-3">
+        <div class="lang-switch" role="group" data-i18n-aria="language" aria-label="Language">
+          <button type="button" data-lang="en" lang="en" aria-pressed="true">EN</button>
+          <button type="button" data-lang="zh" lang="zh-CN" aria-pressed="false">中文</button>
+        </div>
+        <a href="#places" data-i18n="startTravel" class="hidden md:inline-flex items-center border border-white rounded-full px-5 py-2 text-[14px] font-normal text-white bg-transparent hover:bg-white hover:text-black transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+          Start Travel
+        </a>
+        <button id="menu-btn" type="button" class="md:hidden -mr-2 p-2 text-white rounded-full hover:bg-white/10 transition-colors" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+            <path class="menu-open" d="M4 7h16M4 12h16M4 17h16" />
+            <path class="menu-close hidden" d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <div id="mobile-menu" class="md:hidden grid transition-[grid-template-rows,opacity] duration-300 ease-out" style="grid-template-rows: 0fr; opacity: 0;" aria-hidden="true">
+      <div class="overflow-hidden">
+        <ul class="px-6 pb-6 pt-1 flex flex-col">
+          <li><a href="#about" data-i18n="nav.about" class="block py-3 text-base text-white/90 border-b border-white/10">About</a></li>
+          <li><a href="#services" data-i18n="nav.services" class="block py-3 text-base text-white/90 border-b border-white/10">Services</a></li>
+          <li><a href="#locations" data-i18n="nav.locations" class="block py-3 text-base text-white/90 border-b border-white/10">Locations</a></li>
+          <li><a href="#places" data-i18n="nav.places" class="block py-3 text-base text-white/90 border-b border-white/10">Places</a></li>
+          <li><a href="#support" data-i18n="nav.support" class="block py-3 text-base text-white/90 border-b border-white/10">Support</a></li>
+          <li class="pt-5"><a href="#places" data-i18n="startTravel" class="flex justify-center rounded-full border border-white py-2.5 text-[14px] text-white">Start Travel</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1" class="outline-none">
+    <!-- ───────── Hero ───────── -->
+    <section id="top" class="relative h-screen w-full overflow-hidden">
+      <video class="absolute inset-0 w-full h-full object-cover" autoplay loop muted playsinline preload="auto" aria-hidden="true"
+        src="assets/hero.mp4" poster="assets/hero-poster.webp"></video>
+      <div class="absolute inset-0 bg-gradient-to-b from-black/10 to-black/40" aria-hidden="true"></div>
+
+      <div class="relative z-10 h-full flex items-center justify-center px-6">
+        <div class="max-w-3xl mx-auto text-center">
+          <h1 class="fade-in-up text-[38px] md:text-[56px] font-medium leading-[1.1] text-white tracking-tight" style="animation-delay: 0.35s" data-i18n-html="hero.title">
+            Travel the World<br>Without Any Stress
+          </h1>
+          <p class="fade-in-up mt-5 text-[15px] md:text-[18px] text-white/80 max-w-xl mx-auto leading-relaxed [text-wrap:balance]" style="animation-delay: 0.5s" data-i18n="hero.sub">
+            Let us take care of the planning while you enjoy meaningful travel experiences crafted just for you.
+          </p>
+          <div class="fade-in-up mt-8" style="animation-delay: 0.65s">
+            <a href="#places" data-i18n="startExploring" class="inline-flex items-center bg-white text-black text-[15px] font-medium px-[26px] py-3 rounded-full shadow-lg shadow-black/25 hover:scale-105 hover:shadow-xl hover:shadow-black/35 transition-[transform,box-shadow] duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+              Start Exploring
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── About ───────── -->
+    <section id="about" class="scroll-mt-20 max-w-7xl mx-auto px-6 py-28 md:py-40 grid md:grid-cols-12 gap-12 md:gap-10 items-center">
+      <div class="md:col-span-7">
+        <h2 class="text-[32px] md:text-[48px] font-medium leading-[1.12] tracking-tight [text-wrap:balance]" data-i18n="about.title">
+          We plan the route, the stays and the small details. You keep the window seat.
+        </h2>
+        <p class="mt-8 text-[16px] md:text-[17px] leading-relaxed text-white/70 max-w-[58ch]" data-i18n="about.body">
+          Tell us where you want to wake up and how you like to travel. A planner builds the whole trip around you, books every leg, and stays one message away until you land back home.
+        </p>
+        <dl class="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 max-w-lg border-t border-white/10 pt-8">
+          <div><dt class="text-[13px] text-white/55" data-i18n="about.k1">Planning</dt><dd class="mt-1 text-[15px] text-white" data-i18n="about.v1">One planner per trip</dd></div>
+          <div><dt class="text-[13px] text-white/55" data-i18n="about.k2">Booking</dt><dd class="mt-1 text-[15px] text-white" data-i18n="about.v2">Every leg, one itinerary</dd></div>
+          <div><dt class="text-[13px] text-white/55" data-i18n="about.k3">While away</dt><dd class="mt-1 text-[15px] text-white" data-i18n="about.v3">A message away</dd></div>
+        </dl>
+      </div>
+      <figure class="md:col-span-5 md:justify-self-end w-full max-w-[420px] mx-auto">
+        <div class="window aspect-[3/4]">
+          <img class="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async"
+            src="assets/img/about-wing.webp" width="1000" height="664"
+            data-i18n-alt="about.imgAlt" alt="An aircraft wing above a sea of clouds at sunrise" />
+        </div>
+        <figcaption class="mt-4 text-center text-[13px] text-white/50" data-i18n="about.caption">Seat 14A, somewhere over the Alps</figcaption>
+      </figure>
+    </section>
+
+    <!-- ───────── Places ───────── -->
+    <section id="places" class="scroll-mt-20 py-24 md:py-32 border-t border-white/5">
+      <div class="max-w-7xl mx-auto px-6 flex items-end justify-between gap-6">
+        <div>
+          <h2 class="text-[32px] md:text-[48px] font-medium leading-[1.1] tracking-tight [text-wrap:balance]" data-i18n="places.title">Places Worth the Long Flight</h2>
+          <p class="mt-4 text-[16px] text-white/70 max-w-[52ch]" data-i18n="places.sub">6 trips our planners know by heart, each timed for the season it looks like this.</p>
+        </div>
+        <div class="hidden sm:flex gap-2 flex-shrink-0">
+          <button type="button" data-scroll="-1" data-i18n-aria="places.prev" class="track-btn w-11 h-11 rounded-full border border-white/25 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors disabled:opacity-30 disabled:pointer-events-none" aria-label="Previous places">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+          </button>
+          <button type="button" data-scroll="1" data-i18n-aria="places.next" class="track-btn w-11 h-11 rounded-full border border-white/25 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors disabled:opacity-30 disabled:pointer-events-none" aria-label="Next places">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </button>
+        </div>
+      </div>
+
+      <ul id="track" class="no-scrollbar track-pad mt-12 flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4" data-i18n-aria="places.list" aria-label="Destinations">
+        <!-- cards rendered by script (per language) -->
+      </ul>
+    </section>
+
+    <!-- ───────── Services ───────── -->
+    <section id="services" class="scroll-mt-20 max-w-7xl mx-auto px-6 py-24 md:py-32 grid md:grid-cols-12 gap-12 border-t border-white/5">
+      <div class="md:col-span-5">
+        <div class="md:sticky md:top-32">
+          <h2 class="text-[32px] md:text-[48px] font-medium leading-[1.1] tracking-tight [text-wrap:balance]" data-i18n="services.title">Everything Between Take-off and Home</h2>
+          <p class="mt-6 text-[16px] text-white/70 max-w-[44ch] leading-relaxed" data-i18n="services.sub">Pick one piece or hand us the whole journey. Either way, it arrives as a single itinerary with one person responsible for it.</p>
+          <a href="#support" data-i18n="services.cta" class="mt-8 inline-flex items-center border border-white rounded-full px-5 py-2 text-[14px] text-white hover:bg-white hover:text-black transition-colors duration-300">Talk to a Planner</a>
+        </div>
+      </div>
+      <ol class="md:col-span-7 border-t border-white/10">
+        <li class="py-8 border-b border-white/10 grid grid-cols-[1fr_auto] gap-6 items-start">
+          <div>
+            <h3 class="text-[22px] md:text-[26px] font-medium tracking-tight" data-i18n="services.s1">Flights &amp; seats</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-white/65 max-w-[48ch]" data-i18n="services.d1">Routes with sane layovers, seats chosen for the view, and rebooking handled by us when plans shift.</p>
+          </div>
+          <div class="window w-20 h-24 hidden sm:block"><img class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="assets/img/svc-flights.webp" width="320" height="213" alt="" /></div>
+        </li>
+        <li class="py-8 border-b border-white/10 grid grid-cols-[1fr_auto] gap-6 items-start">
+          <div>
+            <h3 class="text-[22px] md:text-[26px] font-medium tracking-tight" data-i18n="services.s2">Stays</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-white/65 max-w-[48ch]" data-i18n="services.d2">Small hotels, ryokans and villas we have slept in ourselves, matched to how you like to spend a morning.</p>
+          </div>
+          <div class="window w-20 h-24 hidden sm:block"><img class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="assets/img/svc-stays.webp" width="320" height="213" alt="" /></div>
+        </li>
+        <li class="py-8 border-b border-white/10 grid grid-cols-[1fr_auto] gap-6 items-start">
+          <div>
+            <h3 class="text-[22px] md:text-[26px] font-medium tracking-tight" data-i18n="services.s3">Local guides &amp; road trips</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-white/65 max-w-[48ch]" data-i18n="services.d3">Drivers, walking guides and self-drive routes, with the long stretches timed for golden hour.</p>
+          </div>
+          <div class="window w-20 h-24 hidden sm:block"><img class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="assets/img/svc-roads.webp" width="320" height="226" alt="" /></div>
+        </li>
+        <li class="py-8 grid grid-cols-[1fr_auto] gap-6 items-start">
+          <div>
+            <h3 class="text-[22px] md:text-[26px] font-medium tracking-tight" data-i18n="services.s4">Visas &amp; paperwork</h3>
+            <p class="mt-2 text-[15px] leading-relaxed text-white/65 max-w-[48ch]" data-i18n="services.d4">Checklists per passport, reminders before deadlines, and every confirmation kept in one place.</p>
+          </div>
+          <div class="window w-20 h-24 hidden sm:block"><img class="absolute inset-0 w-full h-full object-cover" loading="lazy" src="assets/img/svc-visas.webp" width="320" height="253" alt="" /></div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ───────── Locations: destination of the month ───────── -->
+    <section id="locations" class="scroll-mt-20 relative min-h-[88vh] flex items-end overflow-hidden">
+      <img class="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async"
+        src="assets/img/halong.webp" width="2200" height="1467"
+        data-i18n-alt="loc.imgAlt" alt="Limestone islands rising from the calm water of Ha Long Bay, Vietnam" />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10" aria-hidden="true"></div>
+      <div class="relative w-full max-w-7xl mx-auto px-6 pb-16 md:pb-24 grid md:grid-cols-12 gap-10 items-end">
+        <div class="md:col-span-7">
+          <h2 class="text-[40px] md:text-[64px] font-medium leading-[1.05] tracking-tight" data-i18n="loc.title">Ha Long Bay, Vietnam</h2>
+          <p class="mt-5 text-[16px] md:text-[18px] leading-relaxed text-white/80 max-w-[52ch]" data-i18n="loc.body">Our pick for this month. Nearly 2,000 limestone islands, still water, and mornings that start in mist. 2 nights on the bay is the right amount of slow.</p>
+        </div>
+        <dl class="md:col-span-5 grid grid-cols-2 gap-x-6 gap-y-5 text-[15px] border-t border-white/20 pt-6">
+          <div><dt class="text-white/60 text-[13px]" data-i18n="loc.k1">Best season</dt><dd class="mt-1" data-i18n="loc.v1">Mar–May, Sep–Nov</dd></div>
+          <div><dt class="text-white/60 text-[13px]" data-i18n="loc.k2">Getting there</dt><dd class="mt-1" data-i18n="loc.v2">Fly into Hanoi, then about 2.5&nbsp;h by road</dd></div>
+          <div><dt class="text-white/60 text-[13px]" data-i18n="loc.k3">Stay</dt><dd class="mt-1" data-i18n="loc.v3">2 nights on the water</dd></div>
+          <div class="self-end"><a href="#support" data-i18n="loc.cta" class="inline-flex items-center bg-white text-black text-[15px] font-medium px-[22px] py-2.5 rounded-full hover:scale-105 transition-transform duration-300">Plan This Trip</a></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ───────── Support ───────── -->
+    <section id="support" class="scroll-mt-20 max-w-7xl mx-auto px-6 py-24 md:py-32 grid md:grid-cols-12 gap-12">
+      <div class="md:col-span-5">
+        <h2 class="text-[32px] md:text-[48px] font-medium leading-[1.1] tracking-tight [text-wrap:balance]" data-i18n="support.title">Questions Before Take-off</h2>
+        <p class="mt-6 text-[16px] text-white/70 leading-relaxed max-w-[42ch]" data-i18n="support.sub">Anything not covered here, your planner will walk you through before you fly.</p>
+      </div>
+      <div class="md:col-span-7 border-t border-white/10" id="faq"></div>
+    </section>
+
+    <!-- ───────── Closing CTA: the window opens up ───────── -->
+    <section class="relative h-[110vh]" aria-labelledby="cta-title">
+      <div class="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
+        <div id="cta-clip" class="cta-clip absolute inset-0" style="clip-path: inset(14% 30% round 220px);">
+          <img class="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async"
+            src="assets/img/cta-clouds.webp" width="2200" height="3300"
+            data-i18n-alt="cta.imgAlt" alt="Sun breaking through clouds, seen from above" />
+          <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/50" aria-hidden="true"></div>
+        </div>
+        <div class="relative z-10 text-center px-6">
+          <h2 id="cta-title" class="text-[40px] md:text-[64px] font-medium leading-[1.05] tracking-tight [text-wrap:balance]" data-i18n-html="cta.title">Your Window Seat<br>Is Waiting</h2>
+          <a href="#places" data-i18n="startExploring" class="mt-8 inline-flex items-center bg-white text-black text-[15px] font-medium px-[26px] py-3 rounded-full shadow-lg shadow-black/25 hover:scale-105 hover:shadow-xl transition-[transform,box-shadow] duration-300">Start Exploring</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ───────── Footer ───────── -->
+  <footer class="border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row gap-8 md:items-center md:justify-between">
+      <a href="#top" class="text-white font-semibold text-xl tracking-tight" lang="en" translate="no">Airlines</a>
+      <ul class="flex flex-wrap gap-x-8 gap-y-3">
+        <li><a href="#about" data-i18n="nav.about" class="text-[14px] text-white/70 hover:text-white transition-colors">About</a></li>
+        <li><a href="#services" data-i18n="nav.services" class="text-[14px] text-white/70 hover:text-white transition-colors">Services</a></li>
+        <li><a href="#locations" data-i18n="nav.locations" class="text-[14px] text-white/70 hover:text-white transition-colors">Locations</a></li>
+        <li><a href="#places" data-i18n="nav.places" class="text-[14px] text-white/70 hover:text-white transition-colors">Places</a></li>
+        <li><a href="#support" data-i18n="nav.support" class="text-[14px] text-white/70 hover:text-white transition-colors">Support</a></li>
+      </ul>
+      <p class="text-[13px] text-white/45" data-i18n="footer">© 2026 Airlines · Photos from Unsplash</p>
+    </div>
+  </footer>
+
+  <script>
+    /* ───────── Copy (en / zh). Best seasons are common public knowledge; the rest is sample copy. ───────── */
+    const PLACES = [
+      { img: 'kyoto', w: 800, h: 534, en: { name: 'Kyoto', country: 'Japan', season: 'Late Mar–Apr, Nov', alt: 'A lantern-lit street leading to a pagoda in Kyoto at dusk' }, zh: { name: '京都', country: '日本', season: '3\u00A0月下旬–4\u00A0月、11\u00A0月', alt: '黄昏时分通往京都八坂塔的石板街' } },
+      { img: 'santorini', w: 800, h: 554, en: { name: 'Santorini', country: 'Greece', season: 'May–Jun, Sep–Oct', alt: 'White houses of Oia, Santorini, glowing at sunset' }, zh: { name: '圣托里尼', country: '希腊', season: '5–6\u00A0月、9–10\u00A0月', alt: '夕阳下泛着暖光的圣托里尼伊亚小镇白房子' } },
+      { img: 'bali', w: 800, h: 1062, en: { name: 'Bali', country: 'Indonesia', season: 'Apr–Oct', alt: 'A water temple on a misty lake in Bali' }, zh: { name: '巴厘岛', country: '印度尼西亚', season: '4–10\u00A0月', alt: '巴厘岛薄雾湖面上的水神庙' } },
+      { img: 'machu-picchu', w: 800, h: 533, en: { name: 'Machu Picchu', country: 'Peru', season: 'May–Sep', alt: 'The ruins of Machu Picchu under mountain clouds' }, zh: { name: '马丘比丘', country: '秘鲁', season: '5–9\u00A0月', alt: '云雾山峦下的马丘比丘遗址' } },
+      { img: 'marrakech', w: 800, h: 532, en: { name: 'Marrakech', country: 'Morocco', season: 'Mar–May, Sep–Nov', alt: 'The Koutoubia minaret with the Atlas mountains behind' }, zh: { name: '马拉喀什', country: '摩洛哥', season: '3–5\u00A0月、9–11\u00A0月', alt: '库图比亚清真寺宣礼塔，远处是阿特拉斯山脉' } },
+      { img: 'braies', w: 800, h: 533, en: { name: 'Lago di Braies', country: 'Italy', season: 'Jun–Sep', alt: 'A wooden rowing boat on the turquoise water of Lago di Braies' }, zh: { name: '布拉耶斯湖', country: '意大利', season: '6–9\u00A0月', alt: '布拉耶斯湖碧绿湖面上的木船' } },
+    ];
+
+    const I18N = {
+      en: {
+        htmlLang: 'en',
+        title: 'Airlines — Travel the World Without Any Stress',
+        description: 'Let us take care of the planning while you enjoy meaningful travel experiences crafted just for you.',
+        mainNav: 'Main', language: 'Language', openMenu: 'Open menu', closeMenu: 'Close menu', skip: 'Skip to content',
+        nav: { about: 'About', services: 'Services', locations: 'Locations', places: 'Places', support: 'Support' },
+        startTravel: 'Start Travel', startExploring: 'Start Exploring',
+        hero: { title: 'Travel the World<br>Without Any Stress', sub: 'Let us take care of the planning while you enjoy meaningful travel experiences crafted just for you.' },
+        about: {
+          title: 'We plan the route, the stays and the small details. You keep the window seat.',
+          body: 'Tell us where you want to wake up and how you like to travel. A planner builds the whole trip around you, books every leg, and stays one message away until you land back home.',
+          k1: 'Planning', v1: 'One planner per trip', k2: 'Booking', v2: 'Every leg, one itinerary', k3: 'While away', v3: 'A message away',
+          imgAlt: 'An aircraft wing above a sea of clouds at sunrise', caption: 'Seat 14A, somewhere over the Alps',
+        },
+        places: {
+          title: 'Places Worth the Long Flight', sub: '6 trips our planners know by heart, each timed for the season it looks like this.',
+          prev: 'Previous places', next: 'Next places', list: 'Destinations', best: 'Best in ',
+        },
+        services: {
+          title: 'Everything Between Take-off and Home',
+          sub: 'Pick one piece or hand us the whole journey. Either way, it arrives as a single itinerary with one person responsible for it.',
+          cta: 'Talk to a Planner',
+          s1: 'Flights & seats', d1: 'Routes with sane layovers, seats chosen for the view, and rebooking handled by us when plans shift.',
+          s2: 'Stays', d2: 'Small hotels, ryokans and villas we have slept in ourselves, matched to how you like to spend a morning.',
+          s3: 'Local guides & road trips', d3: 'Drivers, walking guides and self-drive routes, with the long stretches timed for golden hour.',
+          s4: 'Visas & paperwork', d4: 'Checklists per passport, reminders before deadlines, and every confirmation kept in one place.',
+        },
+        loc: {
+          title: 'Ha Long Bay, Vietnam',
+          body: 'Our pick for this month. Nearly 2,000 limestone islands, still water, and mornings that start in mist. 2 nights on the bay is the right amount of slow.',
+          k1: 'Best season', v1: 'Mar–May, Sep–Nov', k2: 'Getting there', v2: 'Fly into Hanoi, then about 2.5\u00A0h by road', k3: 'Stay', v3: '2 nights on the water',
+          cta: 'Plan This Trip', imgAlt: 'Limestone islands rising from the calm water of Ha Long Bay, Vietnam',
+        },
+        support: {
+          title: 'Questions Before Take-off',
+          sub: 'Anything not covered here, your planner will walk you through before you fly.',
+          faqs: [
+            ['Can I book only part of a trip?', 'Yes. Many travellers come to us for flights alone, or for a single tricky leg. Everything still lands in one itinerary.'],
+            ['What happens if a flight is cancelled?', 'Your planner is alerted with you, looks for the next workable route and adjusts the stays that depend on it, so you only have to confirm.'],
+            ['Do you help with visas?', 'We prepare a checklist for your passport and destinations and remind you before each deadline. Applications are submitted by you or through the official service.'],
+            ['How far ahead should I start planning?', '3 to 6 months gives the most choice for long-haul trips and peak seasons. Shorter notice works too; the options are simply narrower.'],
+          ],
+        },
+        cta: { title: 'Your Window Seat<br>Is Waiting', imgAlt: 'Sun breaking through clouds, seen from above' },
+        footer: '© 2026 Airlines · Photos from Unsplash',
+      },
+      zh: {
+        htmlLang: 'zh-CN',
+        title: 'Airlines — 畅游世界，一身轻松',
+        description: '行程规划交给我们，你只管享受为你量身打造、真正有意义的旅程。',
+        mainNav: '主导航', language: '语言', openMenu: '打开菜单', closeMenu: '关闭菜单', skip: '跳到正文',
+        nav: { about: '关于我们', services: '服务', locations: '本月推荐', places: '目的地', support: '帮助' },
+        startTravel: '开始旅行', startExploring: '开始探索',
+        hero: { title: '畅游世界<br>一身轻松', sub: '行程规划交给我们，你只管享受为你量身打造、真正有意义的旅程。' },
+        about: {
+          title: '路线、住宿和所有细节，我们来安排。你只管坐在窗边。',
+          body: '告诉我们你想在哪里醒来、喜欢怎样旅行。一位规划师会围绕你设计整趟行程，订好每一段，直到你回到家，都只隔一条消息。',
+          k1: '规划', v1: '一趟旅程，一位规划师', k2: '预订', v2: '每一段，同一份行程单', k3: '旅途中', v3: '随时一条消息',
+          imgAlt: '日出时分，云海之上的机翼', caption: '14A 座，阿尔卑斯山上空某处',
+        },
+        places: {
+          title: '值得长途飞行的地方', sub: '规划师们烂熟于心的 6 条路线，每一条都挑在它最好看的季节出发。',
+          prev: '上一组目的地', next: '下一组目的地', list: '目的地', best: '最佳季节：',
+        },
+        services: {
+          title: '从起飞到回家，一站搞定',
+          sub: '可以只选一项，也可以把整趟旅程交给我们。无论哪种，最后都是一份行程单、一位负责到底的人。',
+          cta: '找规划师聊聊',
+          s1: '机票与选座', d1: '中转时间合理的航线，看得到风景的座位；计划有变时，改签由我们来办。',
+          s2: '住宿', d2: '我们亲自住过的小酒店、日式旅馆和别墅，按你喜欢的清晨节奏来挑。',
+          s3: '当地向导与自驾', d3: '司机、徒步向导和自驾路线，最长的那段路掐准在黄金时刻。',
+          s4: '签证与证件', d4: '按护照准备的材料清单、截止日前的提醒，所有确认单都收在同一个地方。',
+        },
+        loc: {
+          title: '越南 · 下龙湾',
+          body: '这是本月推荐。近 2000 座石灰岩小岛，平静的水面，常在薄雾里开始的清晨。在湾上住两晚，慢得刚刚好。',
+          k1: '最佳季节', v1: '3–5\u00A0月、9–11\u00A0月', k2: '交通', v2: '飞抵河内，再坐车约 2.5\u00A0小时', k3: '住宿', v3: '在船上住两晚',
+          cta: '规划这趟旅程', imgAlt: '越南下龙湾平静海面上耸立的石灰岩岛屿',
+        },
+        support: {
+          title: '出发前的问题',
+          sub: '这里没写到的细节，出发前规划师都会和你逐一确认。',
+          faqs: [
+            ['可以只订行程的一部分吗？', '可以。很多旅客只找我们订机票，或者只处理某一段棘手的行程。所有内容仍会汇总在同一份行程单里。'],
+            ['航班取消了怎么办？', '你的规划师会和你同时收到通知，找出下一条可行的路线，并调整受影响的住宿，你只需要确认。'],
+            ['你们协助办签证吗？', '我们会按你的护照和目的地准备材料清单，并在每个截止日前提醒你。申请由你本人或通过官方渠道提交。'],
+            ['应该提前多久开始规划？', '长途旅行和旺季，提前 3 到 6 个月选择最多。时间紧也可以，只是选项会少一些。'],
+          ],
+        },
+        cta: { title: '你的靠窗座位<br>正在等你', imgAlt: '从高空俯瞰，阳光穿过云层' },
+        footer: '© 2026 Airlines · 照片来自 Unsplash',
+      },
+    };
+
+    const get = (obj, path) => path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+
+    /* ───────── Renderers for the parts that are lists ───────── */
+    const track = document.getElementById('track');
+    const renderPlaces = (lang) => {
+      const t = I18N[lang];
+      track.innerHTML = PLACES.map((p) => {
+        const c = p[lang];
+        return `
+        <li class="snap-start flex-shrink-0 w-[72vw] sm:w-[300px] md:w-[320px]">
+          <a href="#support" class="group block focus-visible:outline-none">
+            <div class="window aspect-[3/4] group-focus-visible:ring-2 group-focus-visible:ring-white">
+              <img class="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async"
+                src="assets/img/${p.img}.webp" width="${p.w}" height="${p.h}" alt="${c.alt}" />
+            </div>
+            <div class="mt-5 flex items-baseline justify-between gap-4 px-1">
+              <h3 class="text-[20px] font-medium tracking-tight">${c.name}</h3>
+              <span class="text-[14px] text-white/55">${c.country}</span>
+            </div>
+            <p class="mt-1 px-1 text-[14px] text-white/65">${t.places.best}${c.season}</p>
+          </a>
+        </li>`;
+      }).join('');
+    };
+
+    const faqEl = document.getElementById('faq');
+    const renderFaq = (lang) => {
+      const initial = faqEl.children.length === 0;
+      const openIdx = [...faqEl.querySelectorAll('details')].map((d, i) => (d.open ? i : -1)).filter((i) => i >= 0);
+      faqEl.innerHTML = I18N[lang].support.faqs.map(([q, a], i) => `
+        <details class="border-b border-white/10"${(initial ? i === 0 : openIdx.includes(i)) ? ' open' : ''}>
+          <summary class="flex items-center justify-between gap-6 py-6 cursor-pointer list-none text-[17px] font-medium transition-colors hover:text-white/75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/60 rounded">
+            ${q}
+            <svg class="faq-icon w-5 h-5 flex-shrink-0 text-white/70 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          </summary>
+          <p class="pb-6 -mt-1 text-[15px] leading-relaxed text-white/65 max-w-[60ch]">${a}</p>
+        </details>`).join('');
+    };
+
+    /* ───────── Track arrows ───────── */
+    const btns = document.querySelectorAll('.track-btn');
+    const step = () => (track.querySelector('li')?.getBoundingClientRect().width || 320) + 24;
+    btns.forEach((b) => b.addEventListener('click', () => track.scrollBy({ left: step() * Number(b.dataset.scroll), behavior: 'smooth' })));
+    function syncBtns() {
+      btns[0].disabled = track.scrollLeft < 8;
+      btns[1].disabled = track.scrollLeft + track.clientWidth > track.scrollWidth - 8;
+    }
+    track.addEventListener('scroll', syncBtns, { passive: true });
+    window.addEventListener('resize', syncBtns);
+    window.addEventListener('load', syncBtns);
+    // Tailwind's CDN styles the injected cards a beat later; re-check whenever their size settles.
+    const ro = 'ResizeObserver' in window ? new ResizeObserver(syncBtns) : null;
+    function observeCards() {
+      if (!ro) return;
+      ro.disconnect();
+      track.querySelectorAll('li').forEach((li) => ro.observe(li));
+    }
+
+    /* ───────── Nav: transparent over the hero, solid once the page moves ───────── */
+    const nav = document.getElementById('nav');
+    const menuBtn = document.getElementById('menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    let menuOpen = false;
+    let currentLang = 'en';
+    const paintNav = () => {
+      const solid = window.scrollY > 40 || menuOpen;
+      nav.classList.toggle('is-solid', solid);
+    };
+    window.addEventListener('scroll', paintNav, { passive: true });
+
+    const setMenu = (open) => {
+      menuOpen = open;
+      menu.style.gridTemplateRows = open ? '1fr' : '0fr';
+      menu.style.opacity = open ? '1' : '0';
+      menu.setAttribute('aria-hidden', String(!open));
+      menuBtn.setAttribute('aria-expanded', String(open));
+      menuBtn.setAttribute('aria-label', open ? I18N[currentLang].closeMenu : I18N[currentLang].openMenu);
+      menuBtn.querySelector('.menu-open').classList.toggle('hidden', open);
+      menuBtn.querySelector('.menu-close').classList.toggle('hidden', !open);
+      menu.querySelectorAll('a').forEach((a) => (a.tabIndex = open ? 0 : -1));
+      paintNav();
+    };
+    menuBtn.addEventListener('click', () => setMenu(!menuOpen));
+    menu.addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+
+    /* ───────── Language ───────── */
+    const LANG_KEY = 'airlines-lang';
+    const initialLang = () => {
+      try {
+        const q = new URLSearchParams(location.search).get('lang');
+        if (q === 'zh' || q === 'en') return q;
+      } catch (e) {}
+      try {
+        const saved = localStorage.getItem(LANG_KEY);
+        if (saved === 'zh' || saved === 'en') return saved;
+      } catch (e) {}
+      const prefs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en']).map((l) => l.toLowerCase());
+      const first = prefs.find((l) => l.startsWith('zh') || l.startsWith('en'));
+      return first && first.startsWith('zh') ? 'zh' : 'en';
+    };
+
+    const applyLang = (lang, persist) => {
+      const t = I18N[lang];
+      currentLang = lang;
+      document.documentElement.lang = t.htmlLang;
+      document.title = t.title;
+      document.querySelector('meta[name="description"]')?.setAttribute('content', t.description);
+      document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = get(t, el.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-html]').forEach((el) => { el.innerHTML = get(t, el.dataset.i18nHtml); });
+      document.querySelectorAll('[data-i18n-aria]').forEach((el) => { el.setAttribute('aria-label', get(t, el.dataset.i18nAria)); });
+      document.querySelectorAll('[data-i18n-alt]').forEach((el) => { el.setAttribute('alt', get(t, el.dataset.i18nAlt)); });
+      document.querySelectorAll('.lang-switch [data-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+      menuBtn.setAttribute('aria-label', menuOpen ? t.closeMenu : t.openMenu);
+      renderPlaces(lang);
+      renderFaq(lang);
+      observeCards();
+      syncBtns();
+      if (persist) {
+        try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+        try {
+          const url = new URL(location.href);
+          url.searchParams.set('lang', lang);
+          history.replaceState(null, '', url);
+        } catch (e) {}
+      }
+    };
+    document.querySelectorAll('.lang-switch [data-lang]').forEach((b) => b.addEventListener('click', () => applyLang(b.dataset.lang, true)));
+    applyLang(initialLang(), false);
+    setMenu(false);
+
+    /* ───────── Closing CTA: the window frame widens to full bleed as you scroll into it ───────── */
+    const clip = document.getElementById('cta-clip');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      const heroVideo = document.querySelector('#top video');
+      heroVideo.removeAttribute('autoplay');
+      heroVideo.pause();
+    }
+    if (reduce) {
+      clip.style.clipPath = 'inset(0 round 0px)';
+    } else {
+      let ticking = false;
+      const section = clip.closest('section');
+      const update = () => {
+        ticking = false;
+        const r = section.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 1.05)));
+        const e = 1 - Math.pow(1 - p, 3);
+        const narrow = window.innerWidth < 768;
+        const ix = (1 - e) * (narrow ? 12 : 30);
+        const iy = (1 - e) * (narrow ? 18 : 14);
+        const rad = (1 - e) * (narrow ? 140 : 220);
+        clip.style.clipPath = `inset(${iy.toFixed(2)}% ${ix.toFixed(2)}% round ${rad.toFixed(1)}px)`;
+      };
+      const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      update();
+    }
+  </script>
+</body>
+</html>
