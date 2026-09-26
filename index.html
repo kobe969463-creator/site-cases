@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#f4f3ef" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#0e0e10" media="(prefers-color-scheme: dark)" />
   <title>网站案例</title>
-  <meta name="description" content="三个不同类型的单页网站案例：AI SaaS 产品页、摄影师作品集、旅行社服务页。" />
+  <meta name="description" content="五个不同类型的网站案例：咖啡品牌官网、B2B 软件官网、AI SaaS 产品页、摄影师作品集、旅行社服务页。" />
   <style>
     :root {
       --bg: #0e0e10;
@@ -83,13 +83,50 @@
   <div class="wrap">
     <header>
       <h1>网站案例</h1>
-      <p class="lede">三个不同类型的单页网站：AI SaaS 产品页、摄影师个人作品集、旅行社服务页。都能直接点开浏览，交互和动效是真实可用的，不是截图；桌面和手机都适配，中英双语一键切换。</p>
+      <p class="lede">五个不同类型的网站：咖啡品牌官网、B2B 软件官网、AI SaaS 产品页、摄影师个人作品集、旅行社服务页。都能直接点开浏览，交互和动效是真实可用的，不是截图；桌面和手机都适配。</p>
     </header>
 
     <main>
       <article class="case">
+        <a class="shot" href="04-roastery-coffee/index.html" aria-label="打开焙序咖啡网站">
+          <img src="covers/04.webp" alt="焙序咖啡首屏：烘焙机前倒出咖啡豆的照片，右侧是一条实时画出的烘焙曲线" width="1440" height="900" fetchpriority="high" />
+        </a>
+        <div>
+          <p class="type">咖啡 · 餐饮品牌官网</p>
+          <h2>焙序咖啡</h2>
+          <p class="pitch">整站围绕「烘焙曲线」：首屏的曲线按真实升温速率逐秒画出来，豆温和阶段读数同步跳动。往下的豆单做成豆包标签，烘焙度滑块一拖，豆子颜色和风味描述跟着变。</p>
+          <dl>
+            <dt>结构</dt><dd>首屏 · 本季豆单 · 烘焙度 · 菜单 · 门店 · 订阅 + 页脚</dd>
+            <dt>技术</dt><dd>原生 HTML / CSS / JS，SVG 曲线 + requestAnimationFrame</dd>
+            <dt>设计</dt><dd>原创（品牌名、视觉、文案）</dd>
+          </dl>
+          <div class="links">
+            <a class="btn primary" href="04-roastery-coffee/index.html">打开网站 →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="case">
+        <a class="shot" href="05-b2b-warehouse/index.html" aria-label="打开仓衡 WMS 网站">
+          <img src="covers/05.webp" alt="仓衡 WMS 首屏：标题“仓库里的每一步，都算得清清楚楚”，右侧是实时的仓库俯视画面" width="1440" height="900" loading="lazy" />
+        </a>
+        <div>
+          <p class="type">企业官网 · B2B 软件</p>
+          <h2>仓衡 WMS</h2>
+          <p class="pitch">首屏是一个用代码画出来的仓库：拣货员沿通道拣货、回台复核，出库单数实时增加。四个核心功能做成可切换的界面样机，底部是带完整校验的预约演示表单。</p>
+          <dl>
+            <dt>结构</dt><dd>首屏 · 客户 · 产品功能 · 数据 · 行业方案 · 客户案例 · 部署 · 价格 · 预约演示 + 常见问题</dd>
+            <dt>技术</dt><dd>原生 HTML / CSS / JS，SVG 实时绘制，无障碍分页签</dd>
+            <dt>设计</dt><dd>原创（品牌名、视觉、文案）</dd>
+          </dl>
+          <div class="links">
+            <a class="btn primary" href="05-b2b-warehouse/index.html">打开网站 →</a>
+          </div>
+        </div>
+      </article>
+      <article class="case">
         <a class="shot" href="01-clarion-ai-saas/index.html" aria-label="打开 Plety 网站">
-          <img src="covers/01.webp" alt="Plety 首屏：黑底上流动的橙色 3D 丝带，标题 The intelligence layer for clear decisions" width="1440" height="900" fetchpriority="high" />
+          <img src="covers/01.webp" alt="Plety 首屏：黑底上流动的橙色 3D 丝带，标题 The intelligence layer for clear decisions" width="1440" height="900" loading="lazy" />
         </a>
         <div>
           <p class="type">AI SaaS 产品落地页</p>
@@ -146,7 +183,7 @@
     </main>
 
     <footer>
-      三个案例的首屏视觉与视频、人像素材来自 <a href="https://sceneai.art" rel="noopener" target="_blank">SceneAI</a>，旅行照片来自 <a href="https://unsplash.com" rel="noopener" target="_blank">Unsplash</a>。案例中的品牌、人物与文案均为示例内容。
+      焙序咖啡、仓衡 WMS 为原创设计；Plety、stories in light、Airlines 三个案例的首屏视觉与视频、人像素材来自 <a href="https://sceneai.art" rel="noopener" target="_blank">SceneAI</a>。照片来自 <a href="https://unsplash.com" rel="noopener" target="_blank">Unsplash</a>。案例中的品牌、人物、价格与数据均为示例内容。
     </footer>
   </div>
 </body>

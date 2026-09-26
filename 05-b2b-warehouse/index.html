@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>仓衡 WMS · 仓储管理系统</title>
+  <meta name="description" content="仓衡 WMS 管住收货、上架、拣货、出库的每个动作。平均 3 周上线，支持私有化部署。" />
+  <meta name="theme-color" content="#f1f1ec" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f1311'/%3E%3Crect x='7' y='7' width='8' height='8' fill='%23f1f1ec'/%3E%3Crect x='17' y='7' width='8' height='8' fill='%23f1f1ec'/%3E%3Crect x='7' y='17' width='8' height='8' fill='%23f1f1ec'/%3E%3Crect x='17' y='17' width='8' height='8' fill='%23ffc400'/%3E%3C/svg%3E" />
+  <link rel="preload" href="assets/fonts/switzer-600.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin />
+  <style>
+    @font-face { font-family: 'Switzer'; font-weight: 400; font-display: swap; src: url(assets/fonts/switzer-400.woff2) format('woff2'); }
+    @font-face { font-family: 'Switzer'; font-weight: 500; font-display: swap; src: url(assets/fonts/switzer-500.woff2) format('woff2'); }
+    @font-face { font-family: 'Switzer'; font-weight: 600; font-display: swap; src: url(assets/fonts/switzer-600.woff2) format('woff2'); }
+    @font-face { font-family: 'Switzer'; font-weight: 700; font-display: swap; src: url(assets/fonts/switzer-700.woff2) format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-weight: 400 500; font-display: swap; src: url(assets/fonts/jetbrains-mono.woff2) format('woff2'); }
+
+    :root {
+      --bg: #f1f1ec;
+      --surface: #fbfbf8;
+      --ink: #0f1311;
+      --ink-2: #2b312d;
+      --muted: #5b635e;
+      --line: rgba(15, 19, 17, 0.12);
+      --line-2: rgba(15, 19, 17, 0.07);
+      --signal: #ffc400;
+      --ok: #1b9a55;
+      --bad: #d9383e;
+      --dark: #101412;
+      --dark-2: #181d1a;
+      --dark-line: rgba(241, 241, 236, 0.1);
+      --gutter: clamp(20px, 4.5vw, 72px);
+      --font: 'Switzer', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.7; -webkit-font-smoothing: antialiased; touch-action: manipulation; overflow-x: hidden; }
+    img, svg { display: block; max-width: 100%; }
+    img { height: auto; }
+    a { color: inherit; text-decoration: none; }
+    h1, h2, h3, h4, p, ul, ol, dl, dd, figure { margin: 0; }
+    ul, ol { padding: 0; list-style: none; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { background: none; border: 0; padding: 0; cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+    ::selection { background: var(--signal); color: var(--ink); }
+    .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+    .num { font-variant-numeric: tabular-nums; }
+    .ln { display: inline-block; white-space: nowrap; }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .skip { position: fixed; top: 12px; left: 12px; z-index: 100; padding: 8px 16px; border-radius: 8px; background: var(--ink); color: var(--bg); transform: translateY(-160%); transition: transform .3s var(--ease); }
+    .skip:focus-visible { transform: none; }
+    .mark { background: linear-gradient(transparent 60%, var(--signal) 60% 94%, transparent 94%); padding: 0 .06em; }
+
+    /* ── 顶栏 ── */
+    .nav { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 40px; padding: 14px var(--gutter); background: rgba(241, 241, 236, 0.86); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid transparent; transition: border-color .3s; }
+    .nav.is-solid { border-bottom-color: var(--line); }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; letter-spacing: .02em; }
+    .logo svg { width: 26px; height: 26px; }
+    .logo small { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--muted); padding: 2px 6px; border: 1px solid var(--line); border-radius: 4px; }
+    .nav__links { display: flex; gap: 28px; font-size: 15px; color: var(--ink-2); }
+    .nav__links a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; text-decoration-color: var(--signal); }
+    .nav__end { margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 15px; }
+    .btn { display: inline-flex; align-items: center; gap: 12px; height: 46px; padding: 0 8px 0 20px; border-radius: 10px; font-weight: 600; font-size: 15px; white-space: nowrap; transition: transform .35s var(--ease), background-color .25s, border-color .25s; }
+    .btn__ic { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 7px; background: var(--signal); color: var(--ink); transition: transform .35s var(--ease); }
+    .btn__ic svg { width: 14px; height: 14px; }
+    .btn--ink { background: var(--ink); color: var(--bg); }
+    .btn--ink:hover .btn__ic { transform: translateX(3px); }
+    .btn--line { border: 1px solid var(--line); padding: 0 20px; }
+    .btn--line:hover { border-color: var(--ink); }
+    .btn--sm { height: 40px; padding: 0 16px; }
+
+    /* ── 首屏 ── */
+    .hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 4vw, 64px); align-items: center; padding: clamp(40px, 7vh, 88px) var(--gutter) clamp(56px, 9vh, 110px); }
+    .kicker { display: inline-flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12.5px; color: var(--muted); letter-spacing: .02em; }
+    .kicker::before { content: ''; width: 8px; height: 8px; background: var(--signal); box-shadow: 0 0 0 3px rgba(255, 196, 0, .25); }
+    .hero h1 { margin-top: 22px; font-size: clamp(36px, 4.3vw, 70px); line-height: 1.14; font-weight: 700; letter-spacing: -0.005em; }
+    .hero__lead { margin-top: 22px; font-size: clamp(16px, 1.2vw, 18px); color: var(--ink-2); max-width: 30em; }
+    .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .hero__proof { display: flex; gap: 28px; margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 13.5px; color: var(--muted); }
+    .hero__proof b { display: block; font-size: 24px; color: var(--ink); font-weight: 700; line-height: 1.3; }
+
+    /* 实时仓库画面 */
+    .twin { background: var(--dark); color: #e9ebe6; border-radius: 16px; padding: 14px; box-shadow: 0 40px 80px -40px rgba(15, 19, 17, .55); }
+    .twin__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 6px 12px; font-size: 13px; }
+    .twin__bar b { font-weight: 600; }
+    .live { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 11.5px; color: #9aa39d; }
+    .live::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #3fd07f; box-shadow: 0 0 0 0 rgba(63, 208, 127, .6); animation: ping 2s infinite; }
+    @keyframes ping { 70% { box-shadow: 0 0 0 7px rgba(63, 208, 127, 0); } 100% { box-shadow: 0 0 0 0 rgba(63, 208, 127, 0); } }
+    .twin__body { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 10px; }
+    .floor { background: var(--dark-2); border-radius: 10px; border: 1px solid var(--dark-line); }
+    .floor svg { width: 100%; height: auto; }
+    .floor .wall { fill: none; stroke: rgba(241, 241, 236, .14); }
+    .floor .cell { fill: rgba(241, 241, 236, .09); transition: fill .6s; }
+    .floor .cell.f2 { fill: rgba(241, 241, 236, .16); }
+    .floor .cell.f3 { fill: rgba(241, 241, 236, .25); }
+    .floor .cell.hit { fill: var(--signal); transition: none; }
+    .floor .target { fill: none; stroke: var(--signal); stroke-width: 1.4; }
+    .floor .zone { fill: rgba(255, 196, 0, .06); stroke: rgba(255, 196, 0, .35); stroke-dasharray: 3 3; }
+    .floor .lbl { fill: #8b948e; font-size: 9.5px; font-family: var(--font); }
+    .floor .lbl.mono { font-family: var(--mono); font-size: 8.5px; }
+    .floor .trail { fill: none; stroke: var(--signal); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .28; }
+    .floor .picker { fill: var(--signal); stroke: var(--dark); stroke-width: 2; }
+    .side { display: grid; grid-template-rows: auto auto 1fr; gap: 10px; min-width: 0; height: 0; min-height: 100%; }
+    .kpi { background: var(--dark-2); border: 1px solid var(--dark-line); border-radius: 10px; padding: 12px 14px; }
+    .kpi dt { font-size: 12px; color: #9aa39d; }
+    .kpi dd { font-family: var(--mono); font-size: 26px; font-weight: 500; line-height: 1.25; color: #fff; }
+    .kpi dd small { font-size: 12px; color: #9aa39d; margin-left: 4px; }
+    .kpi--ok dd { color: #58d98f; }
+    .feed { background: var(--dark-2); border: 1px solid var(--dark-line); border-radius: 10px; padding: 10px 12px; overflow: hidden; min-height: 0; -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
+    .feed h3 { font-size: 12px; font-weight: 500; color: #9aa39d; margin-bottom: 6px; }
+    .feed li { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-top: 1px solid var(--dark-line); font-family: var(--mono); font-size: 11px; color: #c9cec9; animation: slidein .5s var(--ease); white-space: nowrap; }
+    .feed li span:last-child { color: #58d98f; }
+    @keyframes slidein { from { opacity: 0; transform: translateY(-8px); } }
+
+    /* ── 客户 ── */
+    .logos { display: flex; align-items: center; gap: clamp(20px, 4vw, 64px); padding: 26px var(--gutter); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); overflow: hidden; }
+    .logos p { flex: none; font-size: 13px; color: var(--muted); max-width: 9em; line-height: 1.5; }
+    .logos ul { display: flex; flex: 1; justify-content: space-between; gap: clamp(20px, 3vw, 48px); flex-wrap: wrap; }
+    .logos li { font-size: 19px; font-weight: 700; color: #7b827d; letter-spacing: .04em; white-space: nowrap; }
+    .logos li:nth-child(2) { font-weight: 500; letter-spacing: .2em; }
+    .logos li:nth-child(3) { font-family: var(--mono); font-weight: 500; font-size: 16px; }
+    .logos li:nth-child(5) { font-weight: 400; font-style: italic; }
+
+    /* ── 通用 ── */
+    .sec { padding: clamp(88px, 13vh, 150px) var(--gutter); }
+    .sec__head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 32px; align-items: end; margin-bottom: clamp(36px, 6vh, 64px); }
+    .sec__head h2 { margin-top: 16px; font-size: clamp(30px, 3.4vw, 52px); line-height: 1.2; font-weight: 700; }
+    .sec__head > p { color: var(--muted); max-width: 30em; }
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ── 产品：分页签 ── */
+    .tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 12px; padding: 5px; gap: 5px; background: var(--surface); }
+    .tab { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 12px 16px; border-radius: 8px; text-align: left; transition: background-color .25s; }
+    .tab small { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+    .tab b { font-size: 17px; font-weight: 600; }
+    .tab:hover { background: rgba(15, 19, 17, .04); }
+    .tab[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+    .tab[aria-selected="true"] small { color: var(--signal); }
+    .panel { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 4vw, 64px); align-items: center; margin-top: 20px; padding: clamp(24px, 3.5vw, 48px); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+    .panel[hidden] { display: none; }
+    .panel.enter .panel__copy, .panel.enter .ui { animation: panelin .6s var(--ease) both; }
+    .panel.enter .ui { animation-delay: .06s; }
+    @keyframes panelin { from { opacity: 0; transform: translateY(12px); } }
+    .panel h3 { font-size: clamp(24px, 2.2vw, 32px); line-height: 1.3; font-weight: 700; }
+    .panel__copy > p { margin-top: 12px; color: var(--ink-2); }
+    .ticks { margin-top: 20px; display: grid; gap: 10px; }
+    .ticks li { display: grid; grid-template-columns: 20px 1fr; gap: 10px; font-size: 15px; color: var(--ink-2); }
+    .ticks li::before { content: ''; width: 14px; height: 14px; margin-top: 5px; border-radius: 3px; background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3.5 7.2l2.3 2.3 4.7-5' fill='none' stroke='%23ffc400' stroke-width='1.8'/%3E%3C/svg%3E") center / 14px no-repeat; }
+    .panel__metric { display: flex; align-items: baseline; gap: 12px; margin-top: 26px; padding-top: 18px; border-top: 1px dashed var(--line); }
+    .panel__metric b { font-family: var(--mono); font-size: 34px; font-weight: 500; line-height: 1; }
+    .panel__metric span { font-size: 14px; color: var(--muted); }
+
+    /* 界面样机 */
+    .ui { background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 24px 50px -30px rgba(15, 19, 17, .35); overflow: hidden; font-size: 13px; }
+    .ui__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line-2); background: #fafaf7; }
+    .ui__bar b { font-weight: 600; font-size: 13.5px; }
+    .ui__bar span { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+    .ui__body { padding: 16px; }
+    .pill { display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+    .pill--ok { background: rgba(27, 154, 85, .12); color: #137a42; }
+    .pill--bad { background: rgba(217, 56, 62, .12); color: #b42a2f; }
+    .pill--wait { background: rgba(255, 196, 0, .2); color: #7a5a00; }
+    /* 上架：库位热力 */
+    .slots { display: grid; grid-template-columns: minmax(0, 1fr) 190px; gap: 16px; align-items: start; }
+    .slotgrid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; }
+    .slotgrid i { aspect-ratio: 1; border-radius: 2px; background: #e6e7e1; }
+    .slotgrid i.b { background: #c9ccc4; }
+    .slotgrid i.a { background: #8f958f; }
+    .slotgrid i.full { background: repeating-linear-gradient(45deg, #d7d9d2 0 3px, #eceee8 3px 6px); }
+    .slotgrid i.rec { background: var(--signal); box-shadow: 0 0 0 2px var(--ink); position: relative; z-index: 1; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 11.5px; color: var(--muted); }
+    .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+    .rec-card { border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+    .rec-card .mono { font-size: 20px; font-weight: 500; }
+    .rec-card ul { margin-top: 8px; display: grid; gap: 4px; color: var(--ink-2); font-size: 12.5px; }
+    .rec-card ul li::before { content: '· '; color: var(--muted); }
+    .asn { margin-top: 14px; border-top: 1px solid var(--line-2); }
+    .asn li { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line-2); }
+    .asn li span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* 盘点表 */
+    .table { width: 100%; border-collapse: collapse; }
+    .table th { text-align: left; font-weight: 500; font-size: 12px; color: var(--muted); padding: 0 8px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    .table td { padding: 9px 8px; border-bottom: 1px solid var(--line-2); white-space: nowrap; }
+    .table td.r, .table th.r { text-align: right; }
+    .table tr.diff td { background: rgba(217, 56, 62, .05); }
+    .table .mono { font-size: 12px; }
+    .count-sum { display: flex; justify-content: space-between; gap: 12px; margin-top: 14px; font-size: 12.5px; color: var(--muted); }
+    .count-sum b { color: var(--ink); font-family: var(--mono); font-weight: 500; }
+    .progress { height: 6px; border-radius: 999px; background: #eceee8; margin-top: 8px; overflow: hidden; }
+    .progress i { display: block; height: 100%; width: var(--p); background: var(--ink); border-radius: inherit; }
+    /* 拣货路线对比 */
+    .routes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .route { border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+    .route header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+    .route header span { font-size: 12.5px; color: var(--muted); }
+    .route header b { font-family: var(--mono); font-weight: 500; font-size: 18px; }
+    .route--good header b { background: var(--signal); padding: 0 6px; border-radius: 4px; }
+    .route svg { width: 100%; height: auto; }
+    .route .rk { fill: #e1e3dc; }
+    .route .path { fill: none; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+    .route--bad .path { stroke: #9aa09a; stroke-dasharray: 4 3; }
+    .route--good .path { stroke: var(--ink); stroke-dasharray: 600; stroke-dashoffset: 600; }
+    .panel:not([hidden]) .route--good .path { animation: draw 2.4s var(--ease) .3s forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    .route .stop { fill: var(--signal); stroke: var(--ink); stroke-width: 1.2; }
+    .route .start { fill: var(--ink); }
+    .wave { margin-top: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .wave div { border-radius: 8px; background: #f4f4f0; padding: 8px 10px; font-size: 12px; color: var(--muted); }
+    .wave b { display: block; font-family: var(--mono); font-weight: 500; font-size: 16px; color: var(--ink); }
+    /* 出库复核 */
+    .scan { display: grid; grid-template-columns: minmax(0, 1fr) 170px; gap: 16px; }
+    .scan li { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line-2); }
+    .scan li i { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; }
+    .scan li.done i { background: var(--ok); border-color: var(--ok); }
+    .scan li.done i::after { content: ''; width: 8px; height: 4px; border: solid #fff; border-width: 0 0 1.8px 1.8px; transform: rotate(-45deg) translate(1px, -1px); }
+    .scan li.now { background: rgba(255, 196, 0, .12); margin: 0 -8px; padding: 9px 8px; border-radius: 8px; }
+    .scan li.now i { border-color: var(--ink); border-style: dashed; animation: spin 3s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .scan li small { display: block; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .weigh { border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: grid; gap: 10px; align-content: start; }
+    .weigh span { font-size: 12px; color: var(--muted); }
+    .weigh b { display: block; font-family: var(--mono); font-weight: 500; font-size: 22px; line-height: 1.2; }
+
+    /* ── 数据带 ── */
+    .stats { position: relative; color: #f1f1ec; background: var(--dark); isolation: isolate; overflow: hidden; }
+    .stats__bg { position: absolute; inset: 0; z-index: -1; }
+    .stats__bg img { width: 100%; height: 100%; object-fit: cover; object-position: center 60%; opacity: .32; filter: grayscale(.4); }
+    .stats .sec__head > p { color: #b5bbb6; }
+    .stats .kicker { color: #b5bbb6; }
+    .stats__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid rgba(241, 241, 236, .2); }
+    .stat { padding: 26px 24px 8px 0; }
+    .stat + .stat { padding-left: 24px; border-left: 1px solid rgba(241, 241, 236, .2); }
+    .stat b { display: block; font-family: var(--mono); font-weight: 500; font-size: clamp(38px, 4.4vw, 68px); line-height: 1.1; letter-spacing: -0.02em; }
+    .stat b em { font-style: normal; color: var(--signal); }
+    .stat p { margin-top: 10px; color: #c9cec9; font-size: 15px; }
+    .stats__note { margin-top: 36px; font-size: 12.5px; color: #8d948f; }
+
+    /* ── 行业方案：展开面板 ── */
+    .inds { display: flex; gap: 10px; height: 540px; }
+    .ind { position: relative; flex: 1; min-width: 0; border-radius: 14px; overflow: hidden; color: #fff; background: var(--dark); transition: flex-grow .7s var(--ease); isolation: isolate; cursor: pointer; }
+    .ind.is-on { flex-grow: 3.2; cursor: default; }
+    .ind img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform 1.2s var(--ease), opacity .6s; opacity: .55; }
+    .ind.is-on img { opacity: .8; transform: scale(1.03); }
+    .ind::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(16, 20, 18, .15), rgba(16, 20, 18, .88) 78%); }
+    .ind__btn { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 22px; text-align: left; color: inherit; }
+    .ind__btn .mono { font-size: 12px; color: var(--signal); }
+    .ind__name, .ind__more h3 { font-size: 24px; font-weight: 700; line-height: 1.3; transition: opacity .3s; }
+    .ind__more { position: absolute; left: 22px; right: 22px; bottom: 22px; opacity: 0; transform: translateY(12px); transition: opacity .5s var(--ease), transform .5s var(--ease); pointer-events: none; max-width: 34em; }
+    .ind.is-on .ind__more { opacity: 1; transform: none; transition-delay: .2s; pointer-events: auto; }
+    .ind.is-on .ind__name { opacity: 0; }
+    .ind__more h3 { font-size: clamp(24px, 2.2vw, 32px); }
+    .ind__more p { margin-top: 8px; color: #d9ddd8; font-size: 15px; }
+    .ind__more dl { display: flex; gap: 28px; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, .2); }
+    .ind__more dt { font-size: 12.5px; color: #b5bbb6; }
+    .ind__more dd { font-family: var(--mono); font-size: 24px; font-weight: 500; color: var(--signal); }
+
+    /* ── 客户案例 ── */
+    .case { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+    .case__img { position: relative; min-height: 460px; }
+    .case__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .case__body { padding: clamp(28px, 4vw, 56px); display: flex; flex-direction: column; }
+    .case blockquote { margin: 0; font-size: clamp(22px, 2vw, 30px); line-height: 1.5; font-weight: 600; }
+    .case blockquote::before { content: '“'; display: block; font-size: 64px; line-height: .6; color: var(--signal); font-family: Georgia, serif; margin-bottom: 8px; }
+    .case cite { display: block; margin-top: 18px; font-style: normal; color: var(--muted); font-size: 14.5px; }
+    .case__nums { margin-top: auto; padding-top: 32px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .case__nums div { border-top: 2px solid var(--ink); padding-top: 12px; }
+    .case__nums span { display: block; font-size: 13px; color: var(--muted); }
+    .case__nums b { display: block; font-family: var(--mono); font-weight: 500; font-size: 15px; color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(15, 19, 17, .35); }
+    .case__nums strong { display: block; font-family: var(--mono); font-weight: 500; font-size: clamp(22px, 2vw, 30px); line-height: 1.2; }
+
+    /* ── 部署与对接 ── */
+    .deploy { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .dcard { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 26px; transition: border-color .3s, transform .5s var(--ease); }
+    .dcard:hover { border-color: var(--ink); transform: translateY(-4px); }
+    .dcard svg { width: 36px; height: 36px; margin-bottom: 22px; }
+    .dcard h3 { font-size: 20px; font-weight: 700; }
+    .dcard p { margin-top: 8px; color: var(--muted); font-size: 15px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+    .chips li { padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; font-size: 14px; background: var(--surface); }
+    .chips li b { font-family: var(--mono); font-weight: 500; font-size: 11.5px; color: var(--muted); margin-right: 6px; }
+
+    /* ── 价格 ── */
+    .plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
+    .plan { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
+    .plan--hot { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .plan header { display: flex; justify-content: space-between; align-items: center; }
+    .plan h3 { font-size: 20px; font-weight: 700; }
+    .plan__tag { font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: var(--signal); color: var(--ink); }
+    .plan > p { margin-top: 6px; font-size: 14.5px; color: var(--muted); }
+    .plan--hot > p, .plan--hot li { color: #c9cec9; }
+    .plan__price { margin-top: 22px; font-family: var(--mono); font-size: 40px; font-weight: 500; line-height: 1.1; }
+    .plan__price small { font-family: var(--font); font-size: 14px; color: var(--muted); margin-left: 4px; }
+    .plan--hot .plan__price small { color: #9aa39d; }
+    .plan ul { margin: 22px 0 28px; display: grid; gap: 9px; font-size: 14.5px; color: var(--ink-2); }
+    .plan li { display: grid; grid-template-columns: 16px 1fr; gap: 10px; }
+    .plan li::before { content: ''; width: 10px; height: 2px; background: currentColor; margin-top: 11px; opacity: .5; }
+    .plan .btn { margin-top: auto; justify-content: center; }
+    .plan--hot .btn--ink { background: var(--signal); color: var(--ink); }
+    .plan--hot .btn--ink .btn__ic { background: var(--ink); color: var(--signal); }
+
+    /* ── 预约演示 ── */
+    .demo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 5vw, 80px); }
+    .demo h2 { font-size: clamp(30px, 3.4vw, 52px); line-height: 1.2; font-weight: 700; margin-top: 16px; }
+    .demo__copy > p { margin-top: 16px; color: var(--ink-2); max-width: 28em; }
+    .faq { margin-top: 36px; border-top: 1px solid var(--line); }
+    .faq details { border-bottom: 1px solid var(--line); }
+    .faq summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 0; font-weight: 600; cursor: pointer; list-style: none; }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: ''; flex: none; width: 12px; height: 12px; background: linear-gradient(var(--ink), var(--ink)) center / 12px 2px no-repeat, linear-gradient(var(--ink), var(--ink)) center / 2px 12px no-repeat; transition: transform .3s var(--ease); }
+    .faq details[open] summary::after { transform: rotate(45deg); }
+    .faq details p { padding: 0 0 18px; color: var(--muted); font-size: 15px; }
+    .form { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: clamp(24px, 3vw, 40px); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 16px; align-content: start; }
+    .field { display: grid; gap: 6px; }
+    .field--full { grid-column: 1 / -1; }
+    .field label { font-size: 14px; font-weight: 600; }
+    .field label small { font-weight: 400; color: var(--muted); margin-left: 4px; }
+    .field input, .field select, .field textarea { width: 100%; min-height: 46px; padding: 10px 14px; border: 1px solid rgba(15, 19, 17, .2); border-radius: 10px; background: #fff; font-size: 16px; transition: border-color .2s, box-shadow .2s; }
+    .field textarea { min-height: 96px; resize: vertical; }
+    .field select { appearance: none; -webkit-appearance: none; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5l3.5 3.5 3.5-3.5' fill='none' stroke='%230f1311' stroke-width='1.5'/%3E%3C/svg%3E") right 14px center / 12px no-repeat; padding-right: 38px; }
+    .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px rgba(255, 196, 0, .45); }
+    .field [aria-invalid="true"] { border-color: var(--bad); }
+    .err { font-size: 13px; color: var(--bad); min-height: 0; }
+    .err:empty { display: none; }
+    .form__foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-top: 4px; }
+    .form__foot p { font-size: 13px; color: var(--muted); }
+    .form .btn { height: 50px; }
+    .done { grid-column: 1 / -1; text-align: left; padding: 24px 0; }
+    .done h3 { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+    .done h3::before { content: ''; width: 28px; height: 28px; border-radius: 50%; background: var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3.5 7.2l2.3 2.3 4.7-5' fill='none' stroke='%23fff' stroke-width='1.8'/%3E%3C/svg%3E") center / 16px no-repeat; }
+    .done p { margin-top: 10px; color: var(--muted); }
+
+    /* ── 页脚 ── */
+    .foot { background: var(--dark); color: #c9cec9; padding: clamp(64px, 10vh, 110px) var(--gutter) 32px; }
+    .foot__top { display: grid; grid-template-columns: minmax(0, 4fr) repeat(3, minmax(0, 2fr)); gap: 32px; }
+    .foot .logo { color: #fff; }
+    .foot .logo small { color: #9aa39d; border-color: var(--dark-line); }
+    .foot__top > div > p { margin-top: 14px; font-size: 14px; max-width: 22em; }
+    .foot h4 { font-size: 12.5px; font-weight: 500; color: #8d948f; margin-bottom: 12px; }
+    .foot li a { display: block; padding: 3px 0; font-size: 14.5px; }
+    .foot li a:hover { color: var(--signal); }
+    .foot__legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--dark-line); font-size: 12.5px; color: #8d948f; }
+
+    /* ── 窄屏 ── */
+    @media (max-width: 1180px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero__copy { max-width: 720px; }
+    }
+    @media (max-width: 960px) {
+      .nav__links, .nav__end > a:first-child { display: none; }
+      .sec__head, .panel, .case, .demo { grid-template-columns: 1fr; }
+      .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stats__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat:nth-child(3) { padding-left: 0; border-left: 0; }
+      .inds { flex-direction: column; height: auto; }
+      .ind, .ind.is-on { flex: none; min-height: 360px; cursor: default; }
+      .ind img { opacity: .7; }
+      .ind__name { display: none; }
+      .ind__more { opacity: 1; transform: none; pointer-events: auto; }
+      .case__img { min-height: 300px; }
+      .deploy, .plans { grid-template-columns: 1fr; }
+      .foot__top { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .foot__top > div:first-child { grid-column: 1 / -1; }
+    }
+    @media (max-width: 640px) {
+      .twin__body { grid-template-columns: 1fr; }
+      .side { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto; height: auto; }
+      .feed { grid-column: 1 / -1; -webkit-mask-image: none; mask-image: none; }
+      .feed li:nth-child(n+4) { display: none; }
+      .logos { flex-direction: column; align-items: flex-start; }
+      .logos ul { justify-content: flex-start; gap: 14px 24px; }
+      .logos li { font-size: 16px; }
+      .hero__proof { gap: 18px; }
+      .hero__proof b { font-size: 20px; }
+      .slots, .scan, .routes { grid-template-columns: 1fr; }
+      .table th:nth-child(2), .table td:nth-child(2) { display: none; }
+      .stats__grid { grid-template-columns: 1fr; }
+      .stat + .stat { padding-left: 0; border-left: 0; border-top: 1px solid rgba(241, 241, 236, .2); }
+      .case__nums { grid-template-columns: 1fr; }
+      .form { grid-template-columns: 1fr; }
+      .ind__more dl { gap: 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+      .reveal { opacity: 1; transform: none; }
+      .route--good .path { stroke-dashoffset: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 仓衡 WMS · 网站案例（原创设计与开发）。公司、客户、价格与数据均为虚构；照片来自 Unsplash。 -->
+  <a class="skip" href="#main">跳到正文</a>
+
+  <header class="nav" id="nav">
+    <a class="logo" href="#top" aria-label="仓衡 WMS 首页">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height="26" rx="6" fill="#0f1311" /><rect x="5.5" y="5.5" width="6.5" height="6.5" fill="#f1f1ec" /><rect x="14" y="5.5" width="6.5" height="6.5" fill="#f1f1ec" /><rect x="5.5" y="14" width="6.5" height="6.5" fill="#f1f1ec" /><rect x="14" y="14" width="6.5" height="6.5" fill="#ffc400" /></svg>
+      仓衡<small>WMS</small>
+    </a>
+    <nav class="nav__links" aria-label="主导航">
+      <a href="#product">产品</a><a href="#industries">行业方案</a><a href="#case">客户案例</a><a href="#pricing">价格</a>
+    </nav>
+    <div class="nav__end">
+      <a href="#demo">登录</a>
+      <a class="btn btn--ink btn--sm" href="#demo">预约演示</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- 首屏 -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero__copy">
+        <p class="kicker">仓储管理系统 · 支持私有化部署</p>
+        <h1 id="hero-title"><span class="ln">仓库里的每一步，</span><br /><span class="ln">都算得<span class="mark">清清楚楚</span>。</span></h1>
+        <p class="hero__lead">仓衡 WMS 管住收货、上架、拣货、出库的每一个动作。不用换货架，平均 3 周上线；客户仓库上线后，拣货效率平均提升 38%。</p>
+        <div class="hero__actions">
+          <a class="btn btn--ink" href="#demo">预约产品演示<span class="btn__ic"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" /></svg></span></a>
+          <a class="btn btn--line" href="#product">看看能做什么</a>
+        </div>
+        <dl class="hero__proof">
+          <div><dt class="sr">在用仓库</dt><dd><b class="num">320+</b>个仓库在用</dd></div>
+          <div><dt class="sr">平均上线</dt><dd><b class="num">3 周</b>平均上线</dd></div>
+          <div><dt class="sr">库存准确率</dt><dd><b class="num">99.98%</b>库存准确率</dd></div>
+        </dl>
+      </div>
+
+      <figure class="twin" aria-labelledby="twin-cap">
+        <figcaption class="sr" id="twin-cap">仓衡系统的实时仓库画面示意：4 名拣货员在 8 排货架间按系统规划的路线拣货，右侧显示今日出库单数、拣货准确率和最新复核完成的订单。</figcaption>
+        <div class="twin__bar" aria-hidden="true">
+          <b>嘉兴 1 号仓 · 实时</b>
+          <span class="live" data-clock>--:--:--</span>
+        </div>
+        <div class="twin__body" aria-hidden="true">
+          <div class="floor"><svg viewBox="0 0 640 420" data-floor></svg></div>
+          <div class="side">
+            <dl class="kpi"><dt>今日出库</dt><dd><span data-orders>8,412</span><small>单</small></dd></dl>
+            <dl class="kpi kpi--ok"><dt>拣货准确率</dt><dd>99.98<small>%</small></dd></dl>
+            <div class="feed"><h3>刚刚复核完成</h3><ul data-feed></ul></div>
+          </div>
+        </div>
+      </figure>
+    </section>
+
+    <!-- 客户 -->
+    <section class="logos" aria-label="部分客户">
+      <p>这些公司的仓库，每天都在用仓衡</p>
+      <ul>
+        <li>木森母婴</li><li>拾光家居</li><li>DRIVEN 汽配</li><li>禾丰农品</li><li>星途跨境</li><li>鲜达供应链</li>
+      </ul>
+    </section>
+
+    <!-- 产品 -->
+    <section class="sec" id="product" aria-labelledby="product-title">
+      <div class="sec__head reveal">
+        <div><p class="kicker">产品</p><h2 id="product-title"><span class="ln">一套系统，</span><br /><span class="ln">管住货从进到出的全过程</span></h2></div>
+        <p>四个环节的数据在同一个库里。收货时录进的信息，拣货、复核、盘点时都能直接用，不用来回导表。</p>
+      </div>
+
+      <div class="tabs reveal" role="tablist" aria-label="产品功能">
+        <button class="tab" role="tab" id="t-in" aria-controls="p-in" aria-selected="true"><small class="mono">01</small><b>收货上架</b></button>
+        <button class="tab" role="tab" id="t-count" aria-controls="p-count" aria-selected="false" tabindex="-1"><small class="mono">02</small><b>库存盘点</b></button>
+        <button class="tab" role="tab" id="t-pick" aria-controls="p-pick" aria-selected="false" tabindex="-1"><small class="mono">03</small><b>波次拣货</b></button>
+        <button class="tab" role="tab" id="t-out" aria-controls="p-out" aria-selected="false" tabindex="-1"><small class="mono">04</small><b>出库复核</b></button>
+      </div>
+
+      <!-- 01 收货上架 -->
+      <div class="panel reveal" role="tabpanel" id="p-in" aria-labelledby="t-in" tabindex="0">
+        <div class="panel__copy">
+          <h3><span class="ln">货一到，</span><span class="ln">系统就告诉你放哪</span></h3>
+          <p>按出库频率、体积和同类商品的位置，给每一箱货推荐库位。卖得快的放在离打包台近的地方。</p>
+          <ul class="ticks">
+            <li>扫码收货，自动核对采购单数量</li>
+            <li>库位推荐考虑出库频率、承重和相邻商品</li>
+            <li>满了、锁了的库位自动跳过</li>
+          </ul>
+          <p class="panel__metric"><b>−41%</b><span>拣货员平均行走距离</span></p>
+        </div>
+        <div class="ui" aria-hidden="true">
+          <div class="ui__bar"><b>上架推荐</b><span>ASN-0926-0431</span></div>
+          <div class="ui__body">
+            <div class="slots">
+              <div>
+                <div class="slotgrid" data-slotgrid></div>
+                <p class="legend"><span><i style="background:#8f958f"></i>A 类 · 高频</span><span><i style="background:#c9ccc4"></i>B 类</span><span><i style="background:#e6e7e1"></i>C 类</span><span><i style="background:var(--signal)"></i>推荐</span></p>
+              </div>
+              <div class="rec-card">
+                <span class="pill pill--wait">推荐库位</span>
+                <p class="mono" style="margin-top:8px">A-03-12</p>
+                <ul><li>离打包台 18 米</li><li>同款奶瓶在隔壁库位</li><li>剩余承重 62 kg</li></ul>
+              </div>
+            </div>
+            <ul class="asn">
+              <li><span>婴儿奶瓶 240ml × 48</span><span class="mono">A-03-12</span><span class="pill pill--ok">已上架</span></li>
+              <li><span>防胀气奶嘴 × 120</span><span class="mono">A-03-13</span><span class="pill pill--ok">已上架</span></li>
+              <li><span>奶瓶清洗剂 500ml × 36</span><span class="mono">B-07-04</span><span class="pill pill--wait">待上架</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 02 库存盘点 -->
+      <div class="panel" role="tabpanel" id="p-count" aria-labelledby="t-count" tabindex="0" hidden>
+        <div class="panel__copy">
+          <h3><span class="ln">不停仓也能盘点，</span><span class="ln">差异当场就看到</span></h3>
+          <p>按库区分批盘点，其他区照常发货。实盘数和系统数不一致的，当场标红，并列出最近动过这个库位的人和单据。</p>
+          <ul class="ticks">
+            <li>循环盘点，每天盘一小块，不用停仓</li>
+            <li>差异自动追溯到具体单据和操作人</li>
+            <li>盘点结果一键生成调整单</li>
+          </ul>
+          <p class="panel__metric"><b>99.98%</b><span>客户仓库平均库存准确率</span></p>
+        </div>
+        <div class="ui" aria-hidden="true">
+          <div class="ui__bar"><b>循环盘点 · A 区</b><span>CC-0926-02</span></div>
+          <div class="ui__body">
+            <table class="table">
+              <thead><tr><th>库位</th><th>商品</th><th class="r">系统</th><th class="r">实盘</th><th>结果</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">A-01-03</td><td>婴儿湿巾 80 抽</td><td class="r mono">240</td><td class="r mono">240</td><td><span class="pill pill--ok">一致</span></td></tr>
+                <tr><td class="mono">A-01-04</td><td>纸尿裤 L 码</td><td class="r mono">96</td><td class="r mono">96</td><td><span class="pill pill--ok">一致</span></td></tr>
+                <tr class="diff"><td class="mono">A-01-07</td><td>吸管杯 300ml</td><td class="r mono">58</td><td class="r mono">56</td><td><span class="pill pill--bad">差 2</span></td></tr>
+                <tr><td class="mono">A-02-01</td><td>辅食碗套装</td><td class="r mono">34</td><td class="r mono">34</td><td><span class="pill pill--ok">一致</span></td></tr>
+                <tr><td class="mono">A-02-02</td><td>儿童牙刷 3 支装</td><td class="r mono">150</td><td class="r mono">—</td><td><span class="pill pill--wait">盘点中</span></td></tr>
+              </tbody>
+            </table>
+            <div class="count-sum"><span>已盘 <b>412</b> / 468 个库位</span><span>差异 <b>1</b> 处 · 已追溯到 SO-0925-0877</span></div>
+            <div class="progress" style="--p:88%"><i></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 03 波次拣货 -->
+      <div class="panel" role="tabpanel" id="p-pick" aria-labelledby="t-pick" tabindex="0" hidden>
+        <div class="panel__copy">
+          <h3><span class="ln">一趟拣完一批单，</span><span class="ln">不再来回跑</span></h3>
+          <p>把商品有重叠的订单合成一个波次，按货架顺序排好路线。拣货员跟着手持终端走一条 S 形路线，一趟拣完。</p>
+          <ul class="ticks">
+            <li>自动合并订单，按截单时间分波次</li>
+            <li>路线按库位顺序规划，不走回头路</li>
+            <li>大促时可以临时加人，新人跟着提示也能拣</li>
+          </ul>
+          <p class="panel__metric"><b>+38%</b><span>每小时拣货件数</span></p>
+        </div>
+        <div class="ui" aria-hidden="true">
+          <div class="ui__bar"><b>路线对比 · 同样 12 张订单</b><span>WV-0926-14</span></div>
+          <div class="ui__body">
+            <div class="routes">
+              <div class="route route--bad">
+                <header><span>逐单拣货</span><b>1,284 m</b></header>
+                <svg viewBox="0 0 200 124" data-mini></svg>
+              </div>
+              <div class="route route--good">
+                <header><span>仓衡波次拣货</span><b>516 m</b></header>
+                <svg viewBox="0 0 200 124" data-mini></svg>
+              </div>
+            </div>
+            <div class="wave">
+              <div><b>12</b>合并订单</div>
+              <div><b>37</b>拣货件数</div>
+              <div><b>14′</b>预计用时</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 04 出库复核 -->
+      <div class="panel" role="tabpanel" id="p-out" aria-labelledby="t-out" tabindex="0" hidden>
+        <div class="panel__copy">
+          <h3><span class="ln">扫一件对一件，</span><span class="ln">称重再兜一次底</span></h3>
+          <p>打包前逐件扫码核对，少件、错件当场拦下。封箱后自动称重，和系统预估重量差太多的包裹不让出库。</p>
+          <ul class="ticks">
+            <li>逐件扫码，错件会响提示音</li>
+            <li>称重复核，误差超过 3% 自动拦截</li>
+            <li>复核通过自动打印面单</li>
+          </ul>
+          <p class="panel__metric"><b>−92%</b><span>错发、漏发投诉</span></p>
+        </div>
+        <div class="ui" aria-hidden="true">
+          <div class="ui__bar"><b>出库复核 · 3 号台</b><span>SO-0926-1182</span></div>
+          <div class="ui__body">
+            <div class="scan">
+              <ul>
+                <li class="done"><i></i><span>婴儿奶瓶 240ml<small>6921734900125</small></span><span class="mono">1 / 1</span></li>
+                <li class="done"><i></i><span>防胀气奶嘴<small>6921734900316</small></span><span class="mono">2 / 2</span></li>
+                <li class="now"><i></i><span>奶瓶清洗剂 500ml<small>请扫码…</small></span><span class="mono">0 / 1</span></li>
+                <li><i></i><span>赠品：围兜<small>6921734900781</small></span><span class="mono">0 / 1</span></li>
+              </ul>
+              <div class="weigh">
+                <div><span>称重</span><b>—</b></div>
+                <div><span>预估重量</span><b>1.18 kg</b></div>
+                <div><span>允许误差</span><b>±3%</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 数据带 -->
+    <section class="sec stats" aria-labelledby="stats-title">
+      <div class="stats__bg" aria-hidden="true"><img src="assets/img/aisle.webp" alt="" width="1500" height="2000" loading="lazy" /></div>
+      <div class="sec__head reveal">
+        <div><p class="kicker">上线之后</p><h2 id="stats-title"><span class="ln">客户仓库上线半年，</span><br /><span class="ln">平均发生了这些变化</span></h2></div>
+        <p>统计范围：上线满 6 个月、日均出库 1,000 单以上的客户仓库，对比上线前 3 个月。</p>
+      </div>
+      <div class="stats__grid">
+        <div class="stat reveal"><b><em>+</em><span data-count="38">38</span>%</b><p>每小时拣货件数</p></div>
+        <div class="stat reveal"><b><span data-count="99.98" data-dec="2">99.98</span>%</b><p>库存准确率</p></div>
+        <div class="stat reveal"><b><em>−</em><span data-count="92">92</span>%</b><p>错发、漏发投诉</p></div>
+        <div class="stat reveal"><b><span data-count="1">1</span> 天</b><p>新拣货员上手时间</p></div>
+      </div>
+      <p class="stats__note">本页为网站设计案例，以上数据均为示例。</p>
+    </section>
+
+    <!-- 行业方案 -->
+    <section class="sec" id="industries" aria-labelledby="ind-title">
+      <div class="sec__head reveal">
+        <div><p class="kicker">行业方案</p><h2 id="ind-title"><span class="ln">不同的仓，</span><br /><span class="ln">难处不一样</span></h2></div>
+        <p>同一套系统，按行业预置了不同的流程和规则。上线时不用从零配置。</p>
+      </div>
+      <div class="inds reveal" data-inds>
+        <article class="ind is-on">
+          <img src="assets/img/ind-ecom.webp" alt="电商仓库里整齐排列的黄色周转箱" width="1100" height="733" loading="lazy" />
+          <button class="ind__btn" type="button" aria-expanded="true" aria-controls="ind-1"><span class="mono">01</span><span class="ind__name">电商仓</span></button>
+          <div class="ind__more" id="ind-1">
+            <h3>电商仓</h3>
+            <p>单多、件少、大促时单量翻几倍。按截单时间自动分波次，大促前一键切换预售、爆款专用流程。</p>
+            <dl><div><dt>大促峰值</dt><dd>6×</dd></div><div><dt>当日发货率</dt><dd>99.6%</dd></div></dl>
+          </div>
+        </article>
+        <article class="ind">
+          <img src="assets/img/ind-3pl.webp" alt="穿工作服的员工快步走过仓库通道" width="1100" height="733" loading="lazy" />
+          <button class="ind__btn" type="button" aria-expanded="false" aria-controls="ind-2"><span class="mono">02</span><span class="ind__name">第三方物流</span></button>
+          <div class="ind__more" id="ind-2">
+            <h3>第三方物流</h3>
+            <p>一个仓服务几十个货主。库存、计费、报表按货主隔离，每个货主都能自己登录看库存和账单。</p>
+            <dl><div><dt>单仓货主</dt><dd>60+</dd></div><div><dt>对账用时</dt><dd>−80%</dd></div></dl>
+          </div>
+        </article>
+        <article class="ind">
+          <img src="assets/img/ind-mfg.webp" alt="叉车在高位货架之间搬运托盘" width="1100" height="1036" loading="lazy" />
+          <button class="ind__btn" type="button" aria-expanded="false" aria-controls="ind-3"><span class="mono">03</span><span class="ind__name">制造业原料仓</span></button>
+          <div class="ind__more" id="ind-3">
+            <h3>制造业原料仓</h3>
+            <p>按批次、效期先进先出，产线要料按工单配送。和生产计划打通，缺料提前预警。</p>
+            <dl><div><dt>批次追溯</dt><dd>100%</dd></div><div><dt>停线缺料</dt><dd>−70%</dd></div></dl>
+          </div>
+        </article>
+        <article class="ind">
+          <img src="assets/img/ind-bulk.webp" alt="摆满托盘和大件货物的仓库与叉车" width="1100" height="733" loading="lazy" />
+          <button class="ind__btn" type="button" aria-expanded="false" aria-controls="ind-4"><span class="mono">04</span><span class="ind__name">家居大件</span></button>
+          <div class="ind__more" id="ind-4">
+            <h3>家居大件</h3>
+            <p>一套沙发拆成好几个包裹，系统按套管理，少一个包都不让出库。按体积规划库位和装车顺序。</p>
+            <dl><div><dt>套件漏发</dt><dd>0</dd></div><div><dt>装车用时</dt><dd>−35%</dd></div></dl>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 客户案例 -->
+    <section class="sec" id="case" style="padding-top:0" aria-labelledby="case-title">
+      <h2 class="sr" id="case-title">客户案例</h2>
+      <article class="case reveal">
+        <div class="case__img"><img src="assets/img/case-team.webp" alt="仓库主管拿着文件夹和同事在货架通道里交流" width="1400" height="932" loading="lazy" /></div>
+        <div class="case__body">
+          <p class="kicker" style="margin-bottom:22px">客户案例 · 木森母婴 华东仓</p>
+          <blockquote>上线第三周就赶上大促，单量是平时的 5 倍。我们一个临时工都没加，当天的单当天全发完了。</blockquote>
+          <cite>周敏（化名），木森母婴 仓储负责人</cite>
+          <div class="case__nums">
+            <div><span>日均出库</span><b>8,000 单</b><strong>22,000 单</strong></div>
+            <div><span>错发率</span><b>0.30%</b><strong>0.02%</strong></div>
+            <div><span>上线用时</span><b>预计 6 周</b><strong>19 天</strong></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 部署与对接 -->
+    <section class="sec" style="padding-top:0" aria-labelledby="deploy-title">
+      <div class="sec__head reveal">
+        <div><p class="kicker">部署与对接</p><h2 id="deploy-title"><span class="ln">放在云上，还是</span><br /><span class="ln">放在你自己的机房</span></h2></div>
+        <p>两种方式功能一样。已有的 ERP、电商平台和仓内设备，都能接进来。</p>
+      </div>
+      <div class="deploy">
+        <div class="dcard reveal">
+          <svg viewBox="0 0 36 36" fill="none" stroke="#0f1311" stroke-width="1.6" aria-hidden="true"><path d="M10 26h17a6 6 0 0 0 .6-12 8.5 8.5 0 0 0-16.4 2A5 5 0 0 0 10 26z" /><path d="M14 21h9" stroke="#ffc400" stroke-width="2.4" /></svg>
+          <h3>云端版</h3>
+          <p>开通账号就能用，按仓库按月付费。系统升级、备份、扩容都由我们负责。</p>
+        </div>
+        <div class="dcard reveal">
+          <svg viewBox="0 0 36 36" fill="none" stroke="#0f1311" stroke-width="1.6" aria-hidden="true"><rect x="8" y="6" width="20" height="10" rx="2" /><rect x="8" y="20" width="20" height="10" rx="2" /><path d="M12 11h6M12 25h6" /><circle cx="24" cy="25" r="1.6" fill="#ffc400" stroke="none" /></svg>
+          <h3>私有化部署</h3>
+          <p>部署在你自己的服务器上，数据不出公司。适合对数据安全有要求的制造业和集团客户。</p>
+        </div>
+        <div class="dcard reveal">
+          <svg viewBox="0 0 36 36" fill="none" stroke="#0f1311" stroke-width="1.6" aria-hidden="true"><path d="M13 12l-6 6 6 6M23 12l6 6-6 6" /><path d="M20 9l-4 18" stroke="#ffc400" stroke-width="2.4" /></svg>
+          <h3>开放接口</h3>
+          <p>标准 REST 接口和消息推送，文档公开。对接一个新系统，一般一到两周。</p>
+        </div>
+      </div>
+      <ul class="chips reveal" aria-label="可对接的系统和设备">
+        <li><b class="mono">ERP</b>采购、财务系统</li><li><b class="mono">OMS</b>电商平台订单</li><li><b class="mono">TMS</b>运输与快递</li><li><b class="mono">PDA</b>手持终端</li><li><b class="mono">PTL</b>电子标签</li><li><b class="mono">AGV</b>搬运机器人</li><li><b class="mono">DWS</b>自动称重量方</li>
+      </ul>
+    </section>
+
+    <!-- 价格 -->
+    <section class="sec" id="pricing" style="padding-top:0" aria-labelledby="price-title">
+      <div class="sec__head reveal">
+        <div><p class="kicker">价格</p><h2 id="price-title">按仓库算，没有隐藏费用</h2></div>
+        <p>所有版本都包含上线实施和培训。先免费试用 30 天，满意再付费。</p>
+      </div>
+      <div class="plans">
+        <div class="plan reveal">
+          <header><h3>标准版</h3></header>
+          <p>日均 3,000 单以内的单仓</p>
+          <p class="plan__price">¥1,980<small>/ 仓 / 月</small></p>
+          <ul><li>收货、上架、拣货、出库全流程</li><li>循环盘点</li><li>10 个操作员账号</li><li>工作日在线支持</li></ul>
+          <a class="btn btn--line" href="#demo">免费试用</a>
+        </div>
+        <div class="plan plan--hot reveal">
+          <header><h3>专业版</h3><span class="plan__tag">多数客户选这个</span></header>
+          <p>多仓、多货主，或大促单量波动大</p>
+          <p class="plan__price">¥4,800<small>/ 仓 / 月</small></p>
+          <ul><li>包含标准版全部功能</li><li>波次拣货与路线规划</li><li>多货主隔离与计费</li><li>对接电子标签、称重设备</li><li>7 × 24 小时支持</li></ul>
+          <a class="btn btn--ink" href="#demo">预约演示<span class="btn__ic"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" /></svg></span></a>
+        </div>
+        <div class="plan reveal">
+          <header><h3>私有化</h3></header>
+          <p>集团、制造业，需要数据留在本地</p>
+          <p class="plan__price">按需报价</p>
+          <ul><li>部署在自有服务器</li><li>源码级定制开发</li><li>专属实施团队驻场</li><li>等级保护测评配合</li></ul>
+          <a class="btn btn--line" href="#demo">联系销售</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 预约演示 -->
+    <section class="sec" id="demo" style="padding-top:0" aria-labelledby="demo-title">
+      <div class="demo">
+        <div class="demo__copy reveal">
+          <p class="kicker">预约演示</p>
+          <h2 id="demo-title"><span class="ln">30 分钟，</span><br /><span class="ln">用你仓库的数据演示</span></h2>
+          <p>留下联系方式，产品顾问会在 1 个工作日内联系你。演示前我们会先了解你的仓库规模和出库方式，演示时直接用接近你业务的数据。</p>
+          <div class="faq">
+            <details><summary>上线一般要多久？</summary><p>单仓标准流程平均 3 周：第 1 周梳理流程和导入基础数据，第 2 周培训和试运行，第 3 周正式切换。</p></details>
+            <details><summary>需要换货架或者买新设备吗？</summary><p>不需要。现有货架贴上库位码就能用；手持终端可以用我们推荐的型号，也可以用安卓手机先跑起来。</p></details>
+            <details><summary>能和我们现在的 ERP 对接吗？</summary><p>主流 ERP 和电商平台都有现成的对接方案。自研系统可以走开放接口，我们的实施工程师会协助联调。</p></details>
+            <details><summary>数据安全怎么保证？</summary><p>数据加密存储，每个操作都留痕，权限可以细到某个库区。对安全要求高的客户可以选私有化部署。</p></details>
+          </div>
+        </div>
+
+        <form class="form reveal" novalidate data-form aria-labelledby="demo-title">
+          <div class="field">
+            <label for="f-name">姓名</label>
+            <input id="f-name" name="name" autocomplete="name" required aria-describedby="e-name" />
+            <p class="err" id="e-name" aria-live="polite"></p>
+          </div>
+          <div class="field">
+            <label for="f-phone">手机号</label>
+            <input id="f-phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" required spellcheck="false" aria-describedby="e-phone" placeholder="11 位手机号…" />
+            <p class="err" id="e-phone" aria-live="polite"></p>
+          </div>
+          <div class="field field--full">
+            <label for="f-co">公司名称</label>
+            <input id="f-co" name="company" autocomplete="organization" required aria-describedby="e-co" />
+            <p class="err" id="e-co" aria-live="polite"></p>
+          </div>
+          <div class="field">
+            <label for="f-wh">仓库数量</label>
+            <select id="f-wh" name="warehouses"><option>1 个</option><option>2–5 个</option><option>6 个以上</option></select>
+          </div>
+          <div class="field">
+            <label for="f-vol">日均出库单量</label>
+            <select id="f-vol" name="volume"><option>1,000 单以内</option><option selected>1,000–5,000 单</option><option>5,000–20,000 单</option><option>20,000 单以上</option></select>
+          </div>
+          <div class="field field--full">
+            <label for="f-msg">现在最想解决的问题<small>选填</small></label>
+            <textarea id="f-msg" name="message" placeholder="比如：大促时发不完货、库存对不上…"></textarea>
+          </div>
+          <div class="form__foot">
+            <p>提交即表示同意我们联系你。不会发营销短信。</p>
+            <button class="btn btn--ink" type="submit">提交预约<span class="btn__ic"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" /></svg></span></button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="foot__top">
+      <div>
+        <a class="logo" href="#top" aria-label="仓衡 WMS 回到顶部">
+          <svg viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height="26" rx="6" fill="#f1f1ec" /><rect x="5.5" y="5.5" width="6.5" height="6.5" fill="#0f1311" /><rect x="14" y="5.5" width="6.5" height="6.5" fill="#0f1311" /><rect x="5.5" y="14" width="6.5" height="6.5" fill="#0f1311" /><rect x="14" y="14" width="6.5" height="6.5" fill="#ffc400" /></svg>
+          仓衡<small>WMS</small>
+        </a>
+        <p>让仓库里的每一步都算得清清楚楚。</p>
+      </div>
+      <div><h4>产品</h4><ul><li><a href="#product">收货上架</a></li><li><a href="#product">库存盘点</a></li><li><a href="#product">波次拣货</a></li><li><a href="#product">出库复核</a></li></ul></div>
+      <div><h4>方案</h4><ul><li><a href="#industries">电商仓</a></li><li><a href="#industries">第三方物流</a></li><li><a href="#industries">制造业原料仓</a></li><li><a href="#industries">家居大件</a></li></ul></div>
+      <div><h4>公司</h4><ul><li><a href="#case">客户案例</a></li><li><a href="#pricing">价格</a></li><li><a href="#demo">预约演示</a></li></ul></div>
+    </div>
+    <p class="foot__legal"><span>© 2026 仓衡科技（示例）</span><span>本站为网站设计案例：公司、客户、价格与数据均为虚构，照片来自 Unsplash</span></p>
+  </footer>
+
+  <script>
+    (function () {
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var NS = 'http://www.w3.org/2000/svg';
+      function el(tag, attrs, parent) { var n = document.createElementNS(NS, tag); for (var k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+      // 固定种子的伪随机，每次打开画面一致
+      var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+
+      // 顶栏分隔线
+      var nav = document.getElementById('nav');
+      var onScroll = function () { nav.classList.toggle('is-solid', window.scrollY > 8); };
+      window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+      // 滚动浮现
+      var io = 'IntersectionObserver' in window && !reduce ? new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { rootMargin: '0px 0px -8% 0px' }) : null;
+      document.querySelectorAll('.reveal').forEach(function (n) {
+        var sib = Array.prototype.indexOf.call(n.parentElement.children, n);
+        if (/stats__grid|deploy|plans/.test(n.parentElement.className)) n.style.transitionDelay = sib * 80 + 'ms';
+        if (io) io.observe(n); else n.classList.add('in');
+      });
+
+      // ── 实时仓库画面 ──
+      var svg = document.querySelector('[data-floor]');
+      var RACKS = 8, CELLS = 13, RX0 = 40, RSTEP = 58, RW = 22, RY0 = 44, CH = 22;
+      var aisleX = function (j) { return 22 + j * RSTEP; };           // 第 j 条通道的中线（0..8）
+      var TOP = 28, BOTTOM = 358, LANE = 522;                          // 上下横向通道、打包区旁的竖向通道
+      var stations = [104, 196, 288];
+      el('rect', { class: 'wall', x: 6, y: 6, width: 628, height: 408, rx: 6 }, svg);
+      var cells = [];
+      for (var i = 0; i < RACKS; i++) {
+        cells.push([]);
+        for (var k = 0; k < CELLS; k++) {
+          var r = rnd(), c = el('rect', { class: 'cell' + (r > .72 ? ' f3' : r > .38 ? ' f2' : ''), x: RX0 + i * RSTEP + 1, y: RY0 + k * CH + 1, width: RW - 2, height: CH - 2, rx: 2 }, svg);
+          cells[i].push(c);
+        }
+        var t = el('text', { class: 'lbl mono', x: RX0 + i * RSTEP + RW / 2, y: RY0 + CELLS * CH + 13, 'text-anchor': 'middle' }, svg); t.textContent = String.fromCharCode(65 + i);
+      }
+      el('rect', { class: 'zone', x: 540, y: 60, width: 84, height: 272, rx: 6 }, svg);
+      var zl = el('text', { class: 'lbl', x: 582, y: 52, 'text-anchor': 'middle' }, svg); zl.textContent = '打包复核';
+      stations.forEach(function (sy, n) {
+        el('rect', { x: 552, y: sy - 14, width: 60, height: 28, rx: 4, fill: 'rgba(241,241,236,.07)', stroke: 'rgba(241,241,236,.16)' }, svg);
+        var tt = el('text', { class: 'lbl mono', x: 582, y: sy + 3.5, 'text-anchor': 'middle' }, svg); tt.textContent = (n + 1) + ' 号台';
+      });
+      for (var d = 0; d < 5; d++) el('rect', { x: 60 + d * 92, y: 394, width: 56, height: 10, rx: 2, fill: 'rgba(241,241,236,.1)' }, svg);
+      var dl = el('text', { class: 'lbl', x: 20, y: 403 }, svg); dl.textContent = '收货';
+      var ring = el('g', {}, svg), trails = el('g', {}, svg), dots = el('g', {}, svg);
+
+      var ordersEl = document.querySelector('[data-orders]'), feed = document.querySelector('[data-feed]');
+      var orders = 8412, orderNo = 1180;
+      function pushOrder(station) {
+        orders += 1; orderNo += 1; ordersEl.textContent = orders.toLocaleString('zh-CN');
+        var li = document.createElement('li');
+        li.innerHTML = '<span>SO-0926-' + orderNo + '</span><span>' + (station + 1) + ' 号台 ✓</span>';
+        feed.insertBefore(li, feed.firstChild);
+        while (feed.children.length > 5) feed.removeChild(feed.lastChild);
+      }
+      for (var s0 = 0; s0 < 4; s0++) pushOrder(s0 % 3);
+
+      // 拣货员：从打包台出发，走横向通道进指定货架通道，拣 1–3 件后回打包台
+      function planTrip(p) {
+        var st = Math.floor(rnd() * 3), picks = [], n = 1 + Math.floor(rnd() * 3), pts = [];
+        for (var q = 0; q < n; q++) {
+          var rack = Math.floor(rnd() * RACKS), cell = Math.floor(rnd() * CELLS), side = rnd() > .5 ? 1 : 0;
+          picks.push({ rack: rack, cell: cell, x: aisleX(rack + side), y: RY0 + cell * CH + CH / 2 });
+        }
+        picks.sort(function (a, b) { return b.x - a.x; });              // 从近到远，按通道顺序拣
+        var cur = { x: p.x, y: p.y };
+        function go(x, y, pick) { pts.push({ x: x, y: y, pick: pick }); cur = { x: x, y: y }; }
+        picks.forEach(function (pk) {
+          if (Math.abs(cur.x - pk.x) > .5) {
+            var cy = (cur.y + pk.y) / 2 < (TOP + BOTTOM) / 2 ? TOP : BOTTOM;
+            go(cur.x, cy); go(pk.x, cy);
+          }
+          go(pk.x, pk.y, pk);
+        });
+        var cy2 = cur.y < (TOP + BOTTOM) / 2 ? TOP : BOTTOM;
+        go(cur.x, cy2); go(LANE, cy2); go(LANE, stations[st]);
+        pts[pts.length - 1].drop = st;
+        return pts;
+      }
+      var pickers = [0, 1, 2, 3].map(function (n) {
+        var p = { x: LANE, y: stations[n % 3], wait: n * 900, path: [], hist: [] };
+        p.dot = el('circle', { class: 'picker', r: 5.5, cx: p.x, cy: p.y }, dots);
+        p.trail = el('path', { class: 'trail', d: '' }, trails);
+        p.ring = el('rect', { class: 'target', width: RW + 4, height: CH + 2, rx: 3, opacity: 0 }, ring);
+        return p;
+      });
+      function nextTarget(p) {
+        var t = p.path.find(function (w) { return w.pick; });
+        if (t) { p.ring.setAttribute('x', RX0 + t.pick.rack * RSTEP - 2); p.ring.setAttribute('y', RY0 + t.pick.cell * CH - 1); p.ring.setAttribute('opacity', 1); }
+        else p.ring.setAttribute('opacity', 0);
+      }
+      var SPEED = 78;                                                   // 画布单位 / 秒
+      function step(p, dt) {
+        if (p.wait > 0) { p.wait -= dt * 1000; return; }
+        if (!p.path.length) { p.path = planTrip(p); nextTarget(p); }
+        var w = p.path[0], dx = w.x - p.x, dy = w.y - p.y, dist = Math.hypot(dx, dy), mv = SPEED * dt;
+        if (dist <= mv) {
+          p.x = w.x; p.y = w.y; p.path.shift();
+          if (w.pick) {
+            var c = cells[w.pick.rack][w.pick.cell]; c.classList.add('hit');
+            setTimeout(function () { c.classList.remove('hit'); }, 380);
+            p.wait = 650; nextTarget(p);
+          }
+          if (w.drop !== undefined) { pushOrder(w.drop); p.wait = 900; }
+        } else { p.x += dx / dist * mv; p.y += dy / dist * mv; }
+        p.dot.setAttribute('cx', p.x.toFixed(1)); p.dot.setAttribute('cy', p.y.toFixed(1));
+        p.hist.push(p.x.toFixed(1) + ' ' + p.y.toFixed(1)); if (p.hist.length > 26) p.hist.shift();
+        p.trail.setAttribute('d', 'M' + p.hist.join('L'));
+      }
+      // 初始状态：先模拟 6 秒，打开时画面里已经有人在走
+      for (var f = 0; f < 360; f++) pickers.forEach(function (p) { step(p, 1 / 60); });
+      document.querySelectorAll('.cell.hit').forEach(function (c) { c.classList.remove('hit'); });
+
+      var running = false, visible = true, last = 0;
+      function frame(now) {
+        if (!running) return;
+        var dt = Math.min((now - last) / 1000, 0.05); last = now;
+        pickers.forEach(function (p) { step(p, dt); });
+        requestAnimationFrame(frame);
+      }
+      function setRun(on) { if (reduce) return; if (on && !running) { running = true; last = performance.now(); requestAnimationFrame(frame); } else if (!on) running = false; }
+      if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; setRun(visible && !document.hidden); }).observe(svg);
+      else setRun(true);
+      document.addEventListener('visibilitychange', function () { setRun(visible && !document.hidden); });
+
+      var clock = document.querySelector('[data-clock]');
+      var fmtTime = new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      var tick = function () { clock.textContent = fmtTime.format(new Date()); };
+      tick(); setInterval(tick, 1000);
+
+      // ── 产品分页签：点按与方向键切换 ──
+      var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+      function select(tab, focus) {
+        tabs.forEach(function (t) {
+          var on = t === tab, panel = document.getElementById(t.getAttribute('aria-controls'));
+          t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
+          panel.hidden = !on;
+          if (on) { panel.classList.remove('enter'); void panel.offsetWidth; panel.classList.add('enter'); panel.classList.add('in'); }
+        });
+        if (focus) tab.focus();
+      }
+      tabs.forEach(function (t, i) {
+        t.addEventListener('click', function () { select(t); });
+        t.addEventListener('keydown', function (e) {
+          var j = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null;
+          if (j === null) return; e.preventDefault(); select(tabs[(j + tabs.length) % tabs.length], true);
+        });
+      });
+
+      // 上架推荐：库位热力（越靠右离打包台越近，出库频率越高）
+      var grid = document.querySelector('[data-slotgrid]');
+      for (var row = 0; row < 6; row++) for (var col = 0; col < 10; col++) {
+        var cl = document.createElement('i'), v = col / 9 + (rnd() - .5) * .35;
+        cl.className = row === 2 && col === 8 ? 'rec' : rnd() < .12 ? 'full' : v > .66 ? 'a' : v > .36 ? 'b' : '';
+        grid.appendChild(cl);
+      }
+
+      // 拣货路线对比：同一张小地图，两条路线
+      var mini = document.querySelectorAll('[data-mini]');
+      var routes = [
+        'M192 112 L152 112 L152 34 L152 112 L80 112 L80 58 L80 112 L192 112 L116 112 L116 12 L44 12 L44 70 L44 12 L192 12 L192 112 L8 112 L8 40 L8 112 L152 112 L152 86 L152 112 L192 112',
+        'M192 112 L152 112 L152 12 L116 12 L116 112 L80 112 L80 12 L44 12 L44 112 L8 112 L8 12 L8 112 L192 112',
+      ];
+      var stops = [[152, 34], [152, 86], [116, 50], [80, 58], [44, 70], [8, 40]];
+      mini.forEach(function (m, n) {
+        for (var i2 = 0; i2 < 5; i2++) el('rect', { class: 'rk', x: 20 + i2 * 36, y: 22, width: 12, height: 80, rx: 2 }, m);
+        el('path', { class: 'path', d: routes[n] }, m);
+        stops.forEach(function (s) { el('circle', { class: 'stop', cx: s[0], cy: s[1], r: 3.2 }, m); });
+        el('rect', { class: 'start', x: 184, y: 106, width: 14, height: 12, rx: 2 }, m);
+      });
+
+      // ── 行业方案：悬停 / 聚焦 / 点击展开 ──
+      var inds = Array.prototype.slice.call(document.querySelectorAll('.ind'));
+      function openInd(a) { inds.forEach(function (x) { var on = x === a; x.classList.toggle('is-on', on); x.querySelector('.ind__btn').setAttribute('aria-expanded', on); }); }
+      inds.forEach(function (a) {
+        a.addEventListener('mouseenter', function () { if (window.matchMedia('(hover: hover) and (min-width: 961px)').matches) openInd(a); });
+        a.querySelector('.ind__btn').addEventListener('click', function () { openInd(a); });
+        a.querySelector('.ind__btn').addEventListener('focus', function () { openInd(a); });
+      });
+
+      // ── 数据带：进入视口时数字从 0 滚上来 ──
+      if (!reduce && 'IntersectionObserver' in window) {
+        var cio = new IntersectionObserver(function (es) {
+          es.forEach(function (e) {
+            if (!e.isIntersecting) return; cio.unobserve(e.target);
+            var n = e.target, to = parseFloat(n.dataset.count), dec = +(n.dataset.dec || 0), t0 = performance.now(), from = to > 90 ? to - 12 : 0;
+            (function run(now) {
+              var k = Math.min(1, (now - t0) / 1400); k = 1 - Math.pow(1 - k, 3);
+              n.textContent = (from + (to - from) * k).toFixed(dec);
+              if (k < 1) requestAnimationFrame(run);
+            })(t0);
+          });
+        }, { threshold: .6 });
+        document.querySelectorAll('[data-count]').forEach(function (n) { cio.observe(n); });
+      }
+
+      // ── 预约表单：本地校验，示例站不真的提交 ──
+      var form = document.querySelector('[data-form]');
+      var rules = [
+        ['f-name', 'e-name', function (v) { return v.trim() ? '' : '请填写姓名'; }],
+        ['f-phone', 'e-phone', function (v) { var d = v.replace(/[\s-]/g, ''); return !d ? '请填写手机号' : /^1\d{10}$/.test(d) ? '' : '手机号应为 1 开头的 11 位数字'; }],
+        ['f-co', 'e-co', function (v) { return v.trim() ? '' : '请填写公司名称'; }],
+      ];
+      function check(r) {
+        var inp = document.getElementById(r[0]), msg = r[2](inp.value);
+        document.getElementById(r[1]).textContent = msg;
+        if (msg) inp.setAttribute('aria-invalid', 'true'); else inp.removeAttribute('aria-invalid');
+        return !msg;
+      }
+      rules.forEach(function (r) { document.getElementById(r[0]).addEventListener('blur', function () { if (this.value) check(r); }); });
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var firstBad = null;
+        rules.forEach(function (r) { if (!check(r) && !firstBad) firstBad = document.getElementById(r[0]); });
+        if (firstBad) { firstBad.focus(); return; }
+        var name = document.getElementById('f-name').value.trim();
+        form.innerHTML = '<div class="done" role="status" tabindex="-1"><h3>已收到，' + name.replace(/[<>&"]/g, '') + '</h3><p>产品顾问会在 1 个工作日内打电话给你，确认演示时间。<br />（这是网站设计案例，信息不会真的提交。）</p></div>';
+        form.querySelector('.done').focus();
+      });
+    })();
+  </script>
+</body>
+</html>

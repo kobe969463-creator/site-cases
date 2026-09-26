@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>焙序咖啡 · 杭州小批量自家烘焙</title>
+  <meta name="description" content="焙序咖啡，杭州小批量自家烘焙。每周二、周五出炉，豆子养好再上架。" />
+  <meta name="theme-color" content="#14100d" />
+  <meta name="color-scheme" content="dark" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314100d'/%3E%3Cpath d='M6 22c5 0 6-10 11-10s5 4 9 4' fill='none' stroke='%23ff5b2e' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="preload" href="assets/fonts/cabinet-grotesk-800.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="assets/img/hero-roaster.webp" as="image" />
+  <style>
+    @font-face { font-family: 'Cabinet Grotesk'; font-weight: 500; font-display: swap; src: url(assets/fonts/cabinet-grotesk-500.woff2) format('woff2'); }
+    @font-face { font-family: 'Cabinet Grotesk'; font-weight: 700; font-display: swap; src: url(assets/fonts/cabinet-grotesk-700.woff2) format('woff2'); }
+    @font-face { font-family: 'Cabinet Grotesk'; font-weight: 800; font-display: swap; src: url(assets/fonts/cabinet-grotesk-800.woff2) format('woff2'); }
+
+    :root {
+      --bg: #14100d;
+      --bg-2: #1d1713;
+      --fg: #f1ebe3;
+      --muted: #b5a99c;
+      --line: rgba(241, 235, 227, 0.14);
+      --heat: #ff5b2e;
+      --paper: #ebe4da;
+      --ink: #1b1511;
+      --ink-muted: #6b5f55;
+      --gutter: clamp(20px, 5vw, 80px);
+      --font: 'Cabinet Grotesk', 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 17px; line-height: 1.7; -webkit-font-smoothing: antialiased; touch-action: manipulation; overflow-x: hidden; }
+    img, svg { display: block; max-width: 100%; }
+    img { height: auto; }
+    a { color: inherit; text-decoration: none; }
+    h1, h2, h3, p, ul, ol, dl, dd, figure { margin: 0; }
+    ul, ol { padding: 0; list-style: none; }
+    button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--heat); outline-offset: 4px; border-radius: 4px; }
+    ::selection { background: var(--heat); color: var(--bg); }
+    .num { font-variant-numeric: tabular-nums; }
+    .latin { font-family: 'Cabinet Grotesk', system-ui, sans-serif; }
+    .skip { position: fixed; top: 12px; left: 12px; z-index: 100; padding: 8px 16px; border-radius: 999px; background: var(--fg); color: var(--bg); transform: translateY(-160%); transition: transform .3s var(--ease); }
+    .skip:focus-visible { transform: none; }
+
+    /* ── 顶栏 ── */
+    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px var(--gutter); transition: background-color .4s, backdrop-filter .4s; }
+    .nav.is-solid { background: rgba(20, 16, 13, 0.82); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+    .logo { display: flex; align-items: baseline; gap: 10px; }
+    .logo b { font-size: 24px; font-weight: 700; letter-spacing: 0.08em; }
+    .logo span { font-size: 11px; letter-spacing: 0.22em; color: var(--muted); }
+    .nav__links { display: flex; gap: 32px; font-size: 15px; }
+    .nav__links a { color: var(--muted); transition: color .3s; }
+    .nav__links a:hover { color: var(--fg); }
+    .btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 22px; border-radius: 999px; font-size: 15px; font-weight: 500; transition: transform .4s var(--ease), background-color .3s, color .3s, border-color .3s; }
+    .btn--heat { background: var(--heat); color: #1a0f0a; }
+    .btn--heat:hover { transform: translateY(-2px); background: #ff7a52; }
+    .btn--ghost { border: 1px solid var(--line); color: var(--fg); }
+    .btn--ghost:hover { border-color: var(--fg); }
+    .btn svg { width: 16px; height: 16px; }
+
+    /* ── 首屏 ── */
+    .hero { position: relative; min-height: 100vh; min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: end; gap: clamp(24px, 4vw, 64px); padding: 120px var(--gutter) clamp(40px, 7vh, 80px); overflow: hidden; isolation: isolate; }
+    .hero__bg { position: absolute; inset: 0; z-index: -2; }
+    .hero__bg img { width: 100%; height: 100%; object-fit: cover; object-position: center 40%; }
+    .hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(20, 16, 13, .55) 0%, rgba(20, 16, 13, .35) 40%, rgba(20, 16, 13, .92) 100%), linear-gradient(90deg, rgba(20, 16, 13, .75), rgba(20, 16, 13, 0) 65%); }
+    .hero__meta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; letter-spacing: .12em; color: var(--muted); margin-bottom: 26px; }
+    .hero__meta span + span::before { content: '/'; margin-right: 14px; opacity: .5; }
+    .hero h1 { font-size: clamp(38px, 5.4vw, 88px); line-height: 1.08; font-weight: 600; letter-spacing: 0.01em; }
+    .hero h1 em { font-style: normal; color: var(--heat); }
+    .ln { display: inline-block; white-space: nowrap; }
+    .hero__lead { margin-top: 24px; max-width: 30em; color: #d8cec3; font-size: clamp(16px, 1.3vw, 19px); }
+    .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+
+    /* 烘焙记录面板 */
+    .log { background: rgba(20, 16, 13, .72); border: 1px solid var(--line); border-radius: 18px; padding: 22px 22px 18px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+    .log__head { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: .16em; color: var(--muted); text-transform: uppercase; }
+    .log__head b { color: var(--fg); font-weight: 700; }
+    .log__read { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 16px 0 10px; }
+    .log__read dt { font-size: 12px; color: var(--muted); }
+    .log__read dd { font-size: clamp(22px, 2.2vw, 32px); font-weight: 800; line-height: 1.1; }
+    .log__read dd small { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 2px; }
+    .log__read .stage { color: var(--heat); }
+    .chart { width: 100%; height: auto; overflow: visible; }
+    .chart .grid line { stroke: var(--line); stroke-width: 1; }
+    .chart .axis text { fill: var(--muted); font-size: 11px; font-family: var(--font); }
+    .chart .curve { fill: none; stroke: var(--heat); stroke-width: 2.6; stroke-linecap: round; }
+    .chart .ror { fill: none; stroke: rgba(241, 235, 227, .35); stroke-width: 1.4; stroke-dasharray: 3 4; }
+    .chart .mark circle { fill: var(--bg); stroke: var(--fg); stroke-width: 1.5; }
+    .chart .mark text { fill: var(--fg); font-size: 11.5px; font-family: var(--font); }
+    .chart .mark text.sub { fill: var(--muted); font-size: 10.5px; }
+    .chart .head { fill: var(--heat); }
+    .chart .head-glow { fill: var(--heat); opacity: .25; }
+    .log__legend { display: flex; gap: 18px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .log__legend i { display: inline-block; width: 16px; height: 2px; background: var(--heat); vertical-align: middle; margin-right: 6px; }
+    .log__legend i.dash { background: repeating-linear-gradient(90deg, rgba(241,235,227,.5) 0 3px, transparent 3px 7px); }
+
+    /* ── 通用段落 ── */
+    section { position: relative; }
+    .sec { padding: clamp(90px, 14vh, 160px) var(--gutter); }
+    .sec__head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: end; margin-bottom: clamp(40px, 6vh, 70px); }
+    .sec__head h2 { font-size: clamp(34px, 4.4vw, 64px); line-height: 1.15; font-weight: 600; }
+    .sec__head p { color: var(--muted); max-width: 30em; justify-self: end; }
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+    .reveal.in { opacity: 1; transform: none; }
+
+    /* ── 豆单：豆包标签 ── */
+    .beans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+    .bean { --c: var(--heat); position: relative; display: flex; flex-direction: column; background: var(--bg-2); border-radius: 16px; overflow: hidden; transition: transform .6s var(--ease), box-shadow .6s var(--ease); }
+    .bean:hover { transform: translateY(-8px); box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .8); }
+    .bean__band { position: relative; height: 128px; background: var(--c); color: #140e0b; padding: 16px 18px; display: flex; justify-content: space-between; align-items: flex-start; transition: height .6s var(--ease); }
+    .bean:hover .bean__band { height: 148px; }
+    .bean__no { font-size: 44px; font-weight: 800; line-height: 1; }
+    .bean__proc { font-size: 12px; font-weight: 700; letter-spacing: .1em; border: 1.5px solid currentColor; border-radius: 999px; padding: 3px 10px; }
+    .bean__body { padding: 20px 18px 22px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+    .bean h3 { font-size: 22px; font-weight: 600; line-height: 1.3; }
+    .bean h3 small { display: block; font-size: 12px; letter-spacing: .14em; color: var(--muted); font-weight: 500; margin-top: 2px; text-transform: uppercase; }
+    .bean dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 14px; }
+    .bean dt { color: var(--muted); }
+    .notes { display: flex; flex-wrap: wrap; gap: 6px; }
+    .notes li { font-size: 13px; padding: 3px 10px; border-radius: 999px; background: rgba(241, 235, 227, .07); }
+    .roastbar { position: relative; height: 6px; border-radius: 999px; background: linear-gradient(90deg, #c9a27a, #8a5a34 50%, #3a2216); }
+    .roastbar::after { content: ''; position: absolute; top: 50%; left: var(--at); width: 14px; height: 14px; border-radius: 50%; background: var(--fg); border: 3px solid var(--bg-2); transform: translate(-50%, -50%); }
+    .roastbar__labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .bean__foot { margin-top: auto; display: flex; justify-content: space-between; align-items: baseline; padding-top: 14px; border-top: 1px solid var(--line); }
+    .bean__price { font-size: 24px; font-weight: 800; }
+    .bean__price small { font-size: 13px; color: var(--muted); font-weight: 500; }
+    .bean__foot a { font-size: 14px; color: var(--c); }
+
+    /* ── 烘焙：可拖动烘焙度 ── */
+    .roast { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: center; }
+    .roast__lab { position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 4 / 5; background: #0d0a08; }
+    .roast__lab img { width: 100%; height: 100%; object-fit: cover; transition: filter .25s linear; }
+    .roast__readout { position: absolute; left: 18px; right: 18px; bottom: 18px; display: flex; justify-content: space-between; align-items: flex-end; padding: 14px 16px; border-radius: 14px; background: rgba(20, 16, 13, .72); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+    .roast__readout b { font-size: clamp(26px, 2.6vw, 38px); font-weight: 800; line-height: 1; }
+    .roast__readout span { font-size: 13px; color: var(--muted); }
+    .roast__copy h2 { font-size: clamp(28px, 3.6vw, 56px); line-height: 1.15; font-weight: 600; }
+    .roast__copy > p { color: var(--muted); margin-top: 18px; max-width: 30em; }
+    .slider { margin-top: 36px; }
+    .slider label { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+    .slider label b { color: var(--fg); font-weight: 600; }
+    .slider input { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #d8b48c, #8a5a34 50%, #2c1a11); outline: none; cursor: pointer; }
+    .slider input::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; background: var(--fg); border: 5px solid var(--heat); box-shadow: 0 4px 14px rgba(0, 0, 0, .5); }
+    .slider input::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--fg); border: 5px solid var(--heat); }
+    .slider input:focus-visible { outline: 2px solid var(--heat); outline-offset: 6px; }
+    .flavor { margin-top: 26px; padding: 20px 22px; border-radius: 14px; border: 1px solid var(--line); min-height: 128px; }
+    .flavor h3 { font-size: 20px; font-weight: 600; }
+    .flavor p { color: var(--muted); margin-top: 6px; font-size: 15px; }
+    .steps { margin-top: 44px; display: grid; gap: 0; }
+    .steps li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; padding: 18px 0; border-top: 1px solid var(--line); }
+    .steps li span { font-size: 14px; color: var(--heat); font-weight: 700; }
+    .steps li b { display: block; font-weight: 600; }
+    .steps li p { color: var(--muted); font-size: 15px; }
+
+    /* ── 菜单：浅色菜单板 ── */
+    .menu { background: var(--paper); color: var(--ink); }
+    .menu .sec__head p { color: var(--ink-muted); }
+    .menu__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(28px, 4vw, 64px); }
+    .menu__col h3 { display: flex; justify-content: space-between; align-items: baseline; font-size: 24px; font-weight: 700; padding-bottom: 14px; border-bottom: 2px solid var(--ink); margin-bottom: 8px; }
+    .menu__col h3 small { font-size: 12px; letter-spacing: .16em; font-weight: 500; color: var(--ink-muted); }
+    .menu__item { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 10px; padding: 14px 0; border-bottom: 1px dashed rgba(27, 21, 17, .2); transition: padding-left .4s var(--ease); }
+    .menu__item:hover { padding-left: 8px; }
+    .menu__item b { font-weight: 600; }
+    .menu__item i { font-style: normal; font-size: 13px; color: var(--ink-muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .menu__item span { font-weight: 800; font-size: 20px; }
+    .menu__note { margin-top: 36px; font-size: 14px; color: var(--ink-muted); }
+
+    /* ── 门店 ── */
+    .stores { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .store { position: relative; border-radius: 20px; overflow: hidden; min-height: 520px; display: flex; align-items: flex-end; isolation: isolate; }
+    .store img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform 1.2s var(--ease); }
+    .store:hover img { transform: scale(1.04); }
+    .store::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(20, 16, 13, 0) 30%, rgba(20, 16, 13, .9)); }
+    .store__body { padding: 28px; width: 100%; }
+    .store__tag { display: inline-block; font-size: 12px; letter-spacing: .14em; padding: 4px 12px; border-radius: 999px; background: rgba(241, 235, 227, .14); margin-bottom: 14px; }
+    .store h3 { font-size: clamp(26px, 2.4vw, 34px); font-weight: 600; line-height: 1.25; }
+    .store dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; margin-top: 14px; font-size: 15px; }
+    .store dt { color: var(--muted); }
+    .store__go { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; font-size: 14px; color: var(--heat); }
+
+    /* ── 订阅 ── */
+    .sub { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(28px, 5vw, 80px); align-items: center; margin: 0 var(--gutter); padding: clamp(40px, 6vw, 80px); border-radius: 28px; background: #231a14; overflow: hidden; position: relative; }
+    .sub h2 { font-size: clamp(32px, 3.8vw, 56px); line-height: 1.15; font-weight: 600; }
+    .sub p { color: var(--muted); margin-top: 16px; max-width: 28em; }
+    .sub__price { margin-top: 26px; font-size: 44px; font-weight: 800; }
+    .sub__price small { font-size: 15px; color: var(--muted); font-weight: 500; }
+    .sub__art { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 1; }
+    .sub__art img { width: 100%; height: 100%; object-fit: cover; }
+    .qr { position: absolute; right: 18px; bottom: 18px; width: 128px; padding: 12px; border-radius: 14px; background: var(--fg); color: var(--bg); text-align: center; font-size: 12px; line-height: 1.4; }
+    .qr svg { width: 100%; height: auto; margin-bottom: 6px; }
+
+    /* ── 页脚 ── */
+    .foot { padding: clamp(90px, 14vh, 150px) var(--gutter) 36px; }
+    .foot__big { font-size: clamp(64px, 14vw, 220px); font-weight: 800; line-height: .9; letter-spacing: -0.02em; color: rgba(241, 235, 227, .08); user-select: none; }
+    .foot__row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin-top: 50px; padding-top: 30px; border-top: 1px solid var(--line); font-size: 14px; }
+    .foot__row h4 { margin: 0 0 10px; font-size: 12px; letter-spacing: .16em; color: var(--muted); font-weight: 500; }
+    .foot__row a { display: block; color: #d8cec3; }
+    .foot__row a:hover { color: var(--heat); }
+    .foot__legal { margin-top: 40px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+    /* ── 窄屏 ── */
+    @media (max-width: 1100px) { .beans { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 900px) {
+      .nav__links { display: none; }
+      .hero { grid-template-columns: 1fr; align-items: end; padding-top: 110px; }
+      .log { order: 2; }
+      .sec__head, .roast, .sub { grid-template-columns: 1fr; }
+      .sec__head p { justify-self: start; }
+      .menu__grid, .stores { grid-template-columns: 1fr; }
+      .store { min-height: 420px; }
+      .foot__row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      .beans { grid-template-columns: 1fr; }
+      .nav .btn { padding: 10px 16px; font-size: 14px; }
+      .log__read dd { font-size: 22px; }
+      .sub { padding: 28px 22px; margin: 0 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 焙序咖啡 · 网站案例（原创设计与开发）。品牌、地址、价格均为示例；照片来自 Unsplash。 -->
+  <a class="skip" href="#main">跳到正文</a>
+
+  <header class="nav" id="nav">
+    <a class="logo" href="#top" aria-label="焙序咖啡 首页"><b>焙序</b><span class="latin">BEIXU ROASTERS</span></a>
+    <nav class="nav__links" aria-label="主导航">
+      <a href="#beans">本季豆单</a><a href="#roast">烘焙</a><a href="#menu">菜单</a><a href="#stores">门店</a>
+    </nav>
+    <a class="btn btn--heat" href="#subscribe">小程序点单</a>
+  </header>
+
+  <main id="main">
+    <!-- 首屏 -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero__bg" aria-hidden="true"><img src="assets/img/hero-roaster.webp" alt="" width="2000" height="1335" fetchpriority="high" /></div>
+      <div>
+        <p class="hero__meta"><span>杭州</span><span>小批量自家烘焙</span><span class="latin">EST. 2019</span></p>
+        <h1 id="hero-title"><span class="ln">每一批豆子，</span><br /><span class="ln">都有自己的<em>曲线</em>。</span></h1>
+        <p class="hero__lead">每锅只烘 3 公斤，按曲线手动控火，每一锅都有记录。每周二、周五出炉，豆子养好再上架。</p>
+        <div class="hero__actions">
+          <a class="btn btn--heat" href="#beans">看本季豆单
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" /></svg></a>
+          <a class="btn btn--ghost" href="#stores">来店里坐坐</a>
+        </div>
+      </div>
+
+      <figure class="log" aria-label="烘焙记录：批次 0926，耶加雪菲，出锅豆温 208 摄氏度，总时长 10 分 05 秒">
+        <div class="log__head"><span>烘焙记录 · <b class="num">#0926</b></span><span>耶加雪菲 · 水洗</span></div>
+        <dl class="log__read" aria-hidden="true">
+          <div><dt>豆温</dt><dd class="num"><span data-temp>92.0</span><small>°C</small></dd></div>
+          <div><dt>时间</dt><dd class="num" data-time>00:00</dd></div>
+          <div><dt>阶段</dt><dd class="stage" data-stage>回温</dd></div>
+        </dl>
+        <svg class="chart" viewBox="0 0 420 230" aria-hidden="true">
+          <g class="grid">
+            <line x1="36" y1="20" x2="410" y2="20" /><line x1="36" y1="70" x2="410" y2="70" /><line x1="36" y1="120" x2="410" y2="120" /><line x1="36" y1="170" x2="410" y2="170" /><line x1="36" y1="200" x2="410" y2="200" />
+          </g>
+          <g class="axis">
+            <text x="0" y="24">220°</text><text x="0" y="74">180°</text><text x="0" y="124">140°</text><text x="0" y="174">100°</text>
+            <text x="36" y="222">0'</text><text x="150" y="222">4'</text><text x="262" y="222">8'</text><text x="390" y="222">11'</text>
+          </g>
+          <path class="ror" d="" data-ror />
+          <path class="curve" d="" data-curve />
+          <g class="mark" data-mark="yellow" opacity="0"><circle r="4" /><text dy="-12" text-anchor="middle">转黄</text><text class="sub num" dy="-26" text-anchor="middle" data-mark-label></text></g>
+          <g class="mark" data-mark="crack" opacity="0"><circle r="4" /><text dy="-12" text-anchor="middle">一爆</text><text class="sub num" dy="-26" text-anchor="middle" data-mark-label></text></g>
+          <g class="mark" data-mark="drop" opacity="0"><circle r="4" /><text dy="20" dx="6" text-anchor="end">出锅</text><text class="sub num" dy="34" dx="6" text-anchor="end" data-mark-label></text></g>
+          <circle class="head-glow" r="10" data-head-glow />
+          <circle class="head" r="4.5" data-head />
+        </svg>
+        <p class="log__legend"><span><i></i>豆温</span><span><i class="dash"></i>升温速率</span></p>
+      </figure>
+    </section>
+
+    <!-- 本季豆单 -->
+    <section class="sec" id="beans" aria-labelledby="beans-title">
+      <div class="sec__head reveal">
+        <h2 id="beans-title">本季豆单</h2>
+        <p>四支豆子，四种风土。每支都标好了产地、海拔和我们的烘焙度，挑不准就从耶加雪菲开始。</p>
+      </div>
+      <ul class="beans">
+        <li class="bean reveal" style="--c:#f06a4d">
+          <div class="bean__band"><span class="bean__no latin num">01</span><span class="bean__proc">日晒</span></div>
+          <div class="bean__body">
+            <h3>云南 保山<small class="latin">Yunnan · Baoshan</small></h3>
+            <dl><dt>海拔</dt><dd class="num">1,600 m</dd><dt>品种</dt><dd>卡蒂姆</dd></dl>
+            <ul class="notes" aria-label="风味"><li>红糖</li><li>黑醋栗</li><li>可可</li></ul>
+            <div><div class="roastbar" style="--at:42%" role="img" aria-label="烘焙度：中浅"></div><p class="roastbar__labels"><span>浅</span><span>中</span><span>深</span></p></div>
+            <div class="bean__foot"><p class="bean__price num">¥78 <small>/ 200g</small></p><a href="#subscribe">加入订阅</a></div>
+          </div>
+        </li>
+        <li class="bean reveal" style="--c:#f2b705">
+          <div class="bean__band"><span class="bean__no latin num">02</span><span class="bean__proc">水洗</span></div>
+          <div class="bean__body">
+            <h3>埃塞俄比亚 耶加雪菲<small class="latin">Ethiopia · Yirgacheffe</small></h3>
+            <dl><dt>海拔</dt><dd class="num">1,900–2,200 m</dd><dt>品种</dt><dd>原生种</dd></dl>
+            <ul class="notes" aria-label="风味"><li>茉莉</li><li>柠檬</li><li>蜂蜜</li></ul>
+            <div><div class="roastbar" style="--at:22%" role="img" aria-label="烘焙度：浅"></div><p class="roastbar__labels"><span>浅</span><span>中</span><span>深</span></p></div>
+            <div class="bean__foot"><p class="bean__price num">¥98 <small>/ 200g</small></p><a href="#subscribe">加入订阅</a></div>
+          </div>
+        </li>
+        <li class="bean reveal" style="--c:#58b37b">
+          <div class="bean__band"><span class="bean__no latin num">03</span><span class="bean__proc">厌氧发酵</span></div>
+          <div class="bean__body">
+            <h3>哥伦比亚 慧兰<small class="latin">Colombia · Huila</small></h3>
+            <dl><dt>海拔</dt><dd class="num">1,700 m</dd><dt>品种</dt><dd>卡杜拉</dd></dl>
+            <ul class="notes" aria-label="风味"><li>葡萄</li><li>朗姆</li><li>牛奶巧克力</li></ul>
+            <div><div class="roastbar" style="--at:55%" role="img" aria-label="烘焙度：中"></div><p class="roastbar__labels"><span>浅</span><span>中</span><span>深</span></p></div>
+            <div class="bean__foot"><p class="bean__price num">¥108 <small>/ 200g</small></p><a href="#subscribe">加入订阅</a></div>
+          </div>
+        </li>
+        <li class="bean reveal" style="--c:#c46aa8">
+          <div class="bean__band"><span class="bean__no latin num">04</span><span class="bean__proc">水洗</span></div>
+          <div class="bean__body">
+            <h3>肯尼亚 涅里 AA<small class="latin">Kenya · Nyeri</small></h3>
+            <dl><dt>海拔</dt><dd class="num">1,800 m</dd><dt>品种</dt><dd>SL28 / SL34</dd></dl>
+            <ul class="notes" aria-label="风味"><li>黑加仑</li><li>番茄</li><li>红糖</li></ul>
+            <div><div class="roastbar" style="--at:38%" role="img" aria-label="烘焙度：中浅"></div><p class="roastbar__labels"><span>浅</span><span>中</span><span>深</span></p></div>
+            <div class="bean__foot"><p class="bean__price num">¥118 <small>/ 200g</small></p><a href="#subscribe">加入订阅</a></div>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 烘焙 -->
+    <section class="sec" id="roast" aria-labelledby="roast-title">
+      <div class="roast">
+        <figure class="roast__lab reveal">
+          <img src="assets/img/beans-macro.webp" alt="烘焙后的咖啡豆特写，颜色会随下方烘焙度滑块变化" width="1200" height="1799" loading="lazy" data-roast-img />
+          <figcaption class="roast__readout" aria-hidden="true"><span>出锅豆温</span><b class="num" data-roast-temp>204°C</b></figcaption>
+        </figure>
+        <div class="roast__copy reveal">
+          <h2 id="roast-title"><span class="ln">同一支豆子，</span><br /><span class="ln">烘深烘浅是两杯咖啡。</span></h2>
+          <p>烘焙度决定了你喝到的是果酸还是焦糖。拖动下面的滑块，看豆子颜色和风味怎么一起变。</p>
+          <div class="slider">
+            <label for="roast-level"><span>烘焙度</span><b data-roast-name>中浅</b></label>
+            <input id="roast-level" type="range" min="0" max="100" value="40" aria-valuetext="中浅" />
+          </div>
+          <div class="flavor" aria-live="polite">
+            <h3 data-flavor-title>酸甜平衡</h3>
+            <p data-flavor-text>果酸还在，但已经有了红糖和坚果的甜感。适合手冲，也能做一杯不苦的美式。</p>
+          </div>
+          <ol class="steps">
+            <li><span class="num">01</span><div><b>挑豆</b><p>每季只留 4 支，杯测 85 分以上才进豆单。</p></div></li>
+            <li><span class="num">02</span><div><b>小批量烘</b><p>每锅 3 公斤，按曲线手动控火，每一锅都有记录。</p></div></li>
+            <li><span class="num">03</span><div><b>养豆</b><p>出炉后静置 5 到 7 天再上架，风味才完全打开。</p></div></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 菜单 -->
+    <section class="sec menu" id="menu" aria-labelledby="menu-title">
+      <div class="sec__head reveal">
+        <h2 id="menu-title">今日菜单</h2>
+        <p>两家店菜单相同。手冲豆子跟着本季豆单走，卖完就换。</p>
+      </div>
+      <div class="menu__grid">
+        <div class="menu__col reveal">
+          <h3>手冲<small class="latin">POUR OVER</small></h3>
+          <p class="menu__item"><b>云南 保山</b><i>红糖 · 可可</i><span class="num">32</span></p>
+          <p class="menu__item"><b>耶加雪菲</b><i>茉莉 · 柠檬</i><span class="num">38</span></p>
+          <p class="menu__item"><b>慧兰 厌氧</b><i>葡萄 · 朗姆</i><span class="num">42</span></p>
+          <p class="menu__item"><b>涅里 AA</b><i>黑加仑 · 红糖</i><span class="num">45</span></p>
+        </div>
+        <div class="menu__col reveal">
+          <h3>意式<small class="latin">ESPRESSO</small></h3>
+          <p class="menu__item"><b>美式</b><i>热 / 冰</i><span class="num">22</span></p>
+          <p class="menu__item"><b>拿铁</b><i>热 / 冰</i><span class="num">28</span></p>
+          <p class="menu__item"><b>澳白</b><i>双份浓缩</i><span class="num">30</span></p>
+          <p class="menu__item"><b>燕麦拿铁</b><i>燕麦奶</i><span class="num">32</span></p>
+        </div>
+        <div class="menu__col reveal">
+          <h3>季节特调<small class="latin">SEASONAL</small></h3>
+          <p class="menu__item"><b>桂花冷萃</b><i>冷萃 12 小时</i><span class="num">34</span></p>
+          <p class="menu__item"><b>橙 C 美式</b><i>鲜榨橙汁</i><span class="num">30</span></p>
+          <p class="menu__item"><b>生椰拿铁</b><i>椰浆 · 浓缩</i><span class="num">32</span></p>
+          <p class="menu__item"><b>热可可</b><i>不含咖啡</i><span class="num">26</span></p>
+        </div>
+      </div>
+      <p class="menu__note">价格单位：元。所有咖啡可换燕麦奶（+3），可做少糖或无糖。</p>
+    </section>
+
+    <!-- 门店 -->
+    <section class="sec" id="stores" aria-labelledby="stores-title">
+      <div class="sec__head reveal">
+        <h2 id="stores-title">两家店</h2>
+        <p>烘焙工坊在西溪，周一烘豆不开门；南山路店离西湖步行十分钟。</p>
+      </div>
+      <div class="stores">
+        <article class="store reveal">
+          <img src="assets/img/store-lamp.webp" alt="烘焙工坊里暖色吊灯下的座位区" width="1400" height="933" loading="lazy" />
+          <div class="store__body">
+            <span class="store__tag">烘焙工坊</span>
+            <h3>焙序 · 西溪工坊</h3>
+            <dl><dt>地址</dt><dd>杭州市西湖区示例路 88 号</dd><dt>营业</dt><dd class="num">周二至周日 9:00–19:00</dd><dt>备注</dt><dd>可预约烘焙体验课</dd></dl>
+            <a class="store__go" href="#stores">打开导航 →</a>
+          </div>
+        </article>
+        <article class="store reveal">
+          <img src="assets/img/store-bright.webp" alt="明亮的咖啡吧台和意式咖啡机" width="1400" height="900" loading="lazy" />
+          <div class="store__body">
+            <span class="store__tag">咖啡馆</span>
+            <h3>焙序 · 南山路店</h3>
+            <dl><dt>地址</dt><dd>杭州市上城区南山路示例 12 号</dd><dt>营业</dt><dd class="num">每天 8:00–21:00</dd><dt>备注</dt><dd>靠窗位，适合带电脑</dd></dl>
+            <a class="store__go" href="#stores">打开导航 →</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 订阅 -->
+    <section class="sec" style="padding-top:0" id="subscribe" aria-labelledby="sub-title">
+      <div class="sub reveal">
+        <div>
+          <h2 id="sub-title"><span class="ln">豆子寄到家，</span><br /><span class="ln">每月一次。</span></h2>
+          <p>每月第一个周二，寄出当月最新烘焙的两支豆子，附一张冲煮参数卡。随时可以暂停。</p>
+          <p class="sub__price num">¥168 <small>/ 月 · 2 × 200g</small></p>
+          <div class="hero__actions"><a class="btn btn--heat" href="#subscribe">微信扫码订阅</a><a class="btn btn--ghost" href="#beans">先看豆单</a></div>
+        </div>
+        <div class="sub__art">
+          <img src="assets/img/pourover.webp" alt="手冲滤杯正在滴落咖啡" width="1400" height="2100" loading="lazy" />
+          <div class="qr" aria-hidden="true">
+            <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><path fill="currentColor" d="M0 0h7v7H0zM1 1v5h5V1zM2 2h3v3H2zM14 0h7v7h-7zm1 1v5h5V1zm1 1h3v3h-3zM0 14h7v7H0zm1 1v5h5v-5zm1 1h3v3H2zM9 1h2v2H9zm0 3h1v2H9zm2 1h2v2h-2zM8 8h2v2H8zm3 0h3v1h-3zm4 1h2v2h-2zm3-1h3v2h-3zM9 11h2v2H9zm3 1h2v3h-2zm3 1h3v2h-3zm4 1h2v3h-2zM8 15h3v2H8zm4 2h2v2h-2zm3 1h2v3h-2zm-6 2h2v1H9z" /></svg>
+            小程序码<br />（示例）
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot" aria-label="页脚">
+    <p class="foot__big latin" aria-hidden="true">BEIXU</p>
+    <div class="foot__row">
+      <div><h4>焙序咖啡</h4><p style="color:#d8cec3">杭州 · 小批量自家烘焙<br />每周二、周五出炉</p></div>
+      <div><h4>逛逛</h4><a href="#beans">本季豆单</a><a href="#menu">菜单</a><a href="#stores">门店</a></div>
+      <div><h4>关注</h4><a href="#top">小红书</a><a href="#top">大众点评</a><a href="#top">微信公众号</a></div>
+      <div><h4>合作</h4><a href="#top">企业团购</a><a href="#top">豆子批发</a></div>
+    </div>
+    <p class="foot__legal"><span>© 2026 焙序咖啡</span><span>本站为网站设计案例：品牌、地址与价格均为示例，照片来自 Unsplash</span></p>
+  </footer>
+
+  <script>
+    (function () {
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // 顶栏：滚动后加底色
+      var nav = document.getElementById('nav');
+      var paint = function () { nav.classList.toggle('is-solid', window.scrollY > 40); };
+      window.addEventListener('scroll', paint, { passive: true }); paint();
+
+      // 滚动浮现
+      var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { rootMargin: '0px 0px -8% 0px' }) : null;
+      document.querySelectorAll('.reveal').forEach(function (el, i) {
+        el.style.transitionDelay = (el.parentElement.classList.contains('beans') || el.parentElement.classList.contains('menu__grid') || el.parentElement.classList.contains('stores') ? (i % 4) * 90 : 0) + 'ms';
+        if (io && !reduce) io.observe(el); else el.classList.add('in');
+      });
+
+      // ── 烘焙曲线：用升温速率（RoR）逐秒积分出豆温，读数和标注都从同一个模型里算 ──
+      // 入豆后豆温先掉到回温点（90 秒，96°C），之后 RoR 从约 25°C/分 平滑衰减到约 6°C/分
+      var TP = 90, TPT = 96, DROP = 605, T = 660, X0 = 36, X1 = 410;
+      var ror = function (s) { return 23 * Math.exp(-(s - TP) / 280) + 2.55; };
+      var bt = [];
+      for (var s = 0, acc = TPT; s <= DROP; s++) {
+        if (s <= TP) bt.push(TPT + (200 - TPT) * Math.pow(1 - s / TP, 2.5));
+        else { acc += ror(s) / 60; bt.push(acc); }
+      }
+      var tempAt = function (s) { var i = Math.max(0, Math.min(DROP, Math.floor(s))), k = s - i; return i < DROP ? bt[i] + (bt[i + 1] - bt[i]) * k : bt[DROP]; };
+      var sx = function (s) { return X0 + (s / T) * (X1 - X0); };
+      var Y = function (c) { return 20 + (220 - c) * 1.25; };           // 与左侧刻度一致：220°→20，100°→170
+      var Yr = function (r) { return 200 - r * 5.2; };                  // RoR 用自己的比例，只看趋势
+      var path = function (from, to, fn, yf) { var d = ''; for (var t = from; t <= to; t += 3) d += (d ? 'L' : 'M') + sx(t).toFixed(1) + ' ' + yf(fn(t)).toFixed(1); return d; };
+      var curve = document.querySelector('[data-curve]'), rorPath = document.querySelector('[data-ror]');
+      curve.setAttribute('d', path(0, DROP, tempAt, Y) + 'L' + sx(DROP).toFixed(1) + ' ' + Y(tempAt(DROP)).toFixed(1));
+      rorPath.setAttribute('d', path(TP + 12, DROP, ror, Yr));
+      var head = document.querySelector('[data-head]'), glow = document.querySelector('[data-head-glow]');
+      var tempEl = document.querySelector('[data-temp]'), timeEl = document.querySelector('[data-time]'), stageEl = document.querySelector('[data-stage]');
+      function fmt(s) { var m = Math.floor(s / 60), x = Math.floor(s % 60); return (m < 10 ? '0' : '') + m + ':' + (x < 10 ? '0' : '') + x; }
+      var marks = { yellow: 270, crack: 490, drop: DROP };
+      var markEls = {};
+      Object.keys(marks).forEach(function (k) {
+        var t = marks[k], m = document.querySelector('[data-mark="' + k + '"]'); markEls[k] = m;
+        m.setAttribute('transform', 'translate(' + sx(t).toFixed(1) + ' ' + Y(tempAt(t)).toFixed(1) + ')');
+        m.querySelector('[data-mark-label]').textContent = fmt(t) + ' · ' + Math.round(tempAt(t)) + '°';
+      });
+      var len = curve.getTotalLength();
+      function stage(s) { return s < TP ? '回温' : s < 270 ? '脱水' : s < 490 ? '梅纳' : s < DROP ? '发展' : '出锅'; }
+      // 曲线按时间（x 方向）推进，而不是按路径长度，这样读数和笔头始终对得上
+      var xs = []; for (var q = 0; q <= 400; q++) xs.push(curve.getPointAtLength(len * q / 400).x);
+      function lenAtX(x) { for (var q = 1; q <= 400; q++) if (xs[q] >= x) return len * q / 400; return len; }
+      function draw(s) {
+        var l = lenAtX(sx(s));
+        curve.style.strokeDasharray = len; curve.style.strokeDashoffset = len - l;
+        var pt = curve.getPointAtLength(l);
+        head.setAttribute('cx', pt.x); head.setAttribute('cy', pt.y); glow.setAttribute('cx', pt.x); glow.setAttribute('cy', pt.y);
+        tempEl.textContent = tempAt(s).toFixed(1); timeEl.textContent = fmt(s); stageEl.textContent = stage(s);
+        Object.keys(marks).forEach(function (k) { markEls[k].setAttribute('opacity', s >= marks[k] ? 1 : 0); });
+      }
+      if (reduce) { draw(DROP); }
+      else {
+        var start = null, DUR = 7000;
+        var loop = function (now) {
+          if (start === null) start = now;
+          var k = (now - start) / DUR;
+          if (k >= 1) { draw(DROP); return; }
+          draw(k * DROP);
+          requestAnimationFrame(loop);
+        };
+        requestAnimationFrame(loop);
+      }
+
+      // ── 烘焙度滑块：豆子颜色、出锅温度、风味一起变 ──
+      var input = document.getElementById('roast-level'), img = document.querySelector('[data-roast-img]');
+      var nameEl = document.querySelector('[data-roast-name]'), tEl = document.querySelector('[data-roast-temp]');
+      var fTitle = document.querySelector('[data-flavor-title]'), fText = document.querySelector('[data-flavor-text]');
+      var levels = [
+        [0, '浅', '花香与果酸', '像在喝果汁：茉莉、柑橘、莓果都很明显，口感轻盈。最能喝出产地的差别。'],
+        [30, '中浅', '酸甜平衡', '果酸还在，但已经有了红糖和坚果的甜感。适合手冲，也能做一杯不苦的美式。'],
+        [55, '中', '焦糖与坚果', '酸度退后，焦糖、奶油、坚果走到前面。加奶做拿铁最合适。'],
+        [78, '中深', '可可与醇厚', '苦味开始出现，但是可可和黑巧那种苦，醇厚度最高，适合意式浓缩。'],
+        [92, '深', '烟熏与苦韵', '产地风味基本被烘焙味盖住，烟熏、焦糖化的苦。我们很少烘到这里。'],
+      ];
+      function applyRoast(v) {
+        var lv = levels[0]; levels.forEach(function (l) { if (v >= l[0]) lv = l; });
+        var b = 1.55 - v * 0.0105, sat = 0.75 + v * 0.004, sep = 0.35 - v * 0.0025;
+        img.style.filter = 'brightness(' + b.toFixed(3) + ') saturate(' + sat.toFixed(2) + ') sepia(' + Math.max(sep, 0).toFixed(2) + ')';
+        tEl.textContent = Math.round(196 + v * 0.3) + '°C';
+        nameEl.textContent = lv[1]; input.setAttribute('aria-valuetext', lv[1]);
+        if (fTitle.textContent !== lv[2]) { fTitle.textContent = lv[2]; fText.textContent = lv[3]; }
+      }
+      input.addEventListener('input', function () { applyRoast(+input.value); });
+      applyRoast(+input.value);
+    })();
+  </script>
+</body>
+</html>
